@@ -1,5 +1,8 @@
 package ru.isu.antlib.model;
 
+import lombok.Getter;
+
+@Getter
 public enum Role {
     OWNER("Владелец"),
     MEMBER("Участник");

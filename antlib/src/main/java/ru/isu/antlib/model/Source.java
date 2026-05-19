@@ -1,5 +1,8 @@
 package ru.isu.antlib.model;
 
+import lombok.Getter;
+
+@Getter
 public enum Source {
     EBOOK("Электронная книга"),
     SHARED("Из общей библиотеки"),

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ru"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${userBookMark.bookDescription.title} + ' - antLib'">Книга - antLib</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/bookInfo.css}">
+</head>
+<body>
+
+<div th:replace="~{header :: header}"></div>
+
+<div class="container mt-4">
+    <div class="row">
+        <!-- Левая колонка: обложка и отметки -->
+        <div class="col-lg-4 mb-4">
+            <!-- Обложка -->
+            <div class="card mb-4">
+                <div th:if="${userBookMark.bookDescription.cover != null and userBookMark.bookDescription.cover != ''}">
+                    <img th:src="${userBookMark.bookDescription.cover}" alt="Обложка" class="book-cover" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="book-cover-placeholder" style="display: none;">📖</div>
+                </div>
+                <div th:unless="${userBookMark.bookDescription.cover != null and userBookMark.bookDescription.cover != ''}" class="book-cover-placeholder">
+                    📖
+                </div>
+            </div>
+
+            <!-- Отметки пользователя -->
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title text-success mb-3">Мои отметки</h5>
+
+                    <!-- Статус чтения -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Статус</label>
+                        <div>
+                            <span
+                                  th:text="${userBookMark.status != null ? userBookMark.status.value : 'Не указан'}">
+                                Не указан
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Оценка -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Оценка</label>
+                        <div>
+                            <span th:if="${userBookMark.rating != null}">
+                                <span class="text-muted ms-2"><span th:text="${userBookMark.rating}"></span> из 5</span>
+                            </span>
+                            <span th:unless="${userBookMark.rating != null}">—</span>
+                        </div>
+                    </div>
+
+                    <!-- Источник -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Источник</label>
+                        <div th:text="${userBookMark.source != null ? userBookMark.source.value : 'Не указан'}">—</div>
+                    </div>
+
+                    <!-- Дата начала -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Дата начала</label>
+                        <div th:text="${#temporals.format(userBookMark.dateStart, 'dd.MM.yyyy')}">—</div>
+                        <span th:unless="${userBookMark.rating != null}">—</span>
+                    </div>
+
+                    <!-- Дата завершения -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Дата завершения</label>
+                        <div th:text="${#temporals.format(userBookMark.dateFinish, 'dd.MM.yyyy')}">—</div>
+                        <span th:unless="${userBookMark.rating != null}">—</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Правая колонка: информация о книге -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <!-- Название и автор -->
+                    <h2 class="text-success mb-2" th:text="${userBookMark.bookDescription.title}">Название книги</h2>
+                    <h5 class="text-muted mb-4" th:text="${userBookMark.bookDescription.author}">Автор</h5>
+
+                    <!-- Основная информация -->
+                    <div class="section-title">Информация о книге</div>
+
+                    <div class="info-row">
+                        <span class="info-label">ISBN:</span>
+                        <span th:text="${userBookMark.bookDescription.ISBN != null ? userBookMark.bookDescription.ISBN : '—'}">—</span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Год издания:</span>
+                        <span th:text="${userBookMark.bookDescription.year != null ? userBookMark.bookDescription.year : '—'}">—</span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Количество страниц:</span>
+                        <span th:text="${userBookMark.bookDescription.pages != null ? userBookMark.bookDescription.pages : '—'}">—</span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Язык:</span>
+                        <span th:text="${userBookMark.bookDescription.language != null ? userBookMark.bookDescription.language : '—'}">—</span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Издательство:</span>
+                        <span th:text="${userBookMark.bookDescription.publisher != null ? userBookMark.bookDescription.publisher : '—'}">—</span>
+                    </div>
+
+                    <!-- Описание -->
+                    <div th:if="${userBookMark.bookDescription.description != null and userBookMark.bookDescription.description != ''}">
+                        <div class="section-title mt-4">Описание</div>
+                        <p class="text-muted" th:text="${userBookMark.bookDescription.description}">Описание книги...</p>
+                    </div>
+
+                    <!-- Рецензия -->
+                    <div th:if="${userBookMark.review != null and userBookMark.review != ''}">
+                        <div class="section-title mt-4">Моя рецензия</div>
+                        <p class="text-muted" th:text="${userBookMark.review}">Рецензия...</p>
+                    </div>
+
+                    <!-- Кнопки действий -->
+                    <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                        <a th:href="@{/books/}" class="btn btn-outline-secondary">
+                            Назад к списку
+                        </a>
+
+                        <a th:href="@{/books/edit/{id}(id=${userBookMark.id})}" class="btn btn-outline-success">
+                            Изменить
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

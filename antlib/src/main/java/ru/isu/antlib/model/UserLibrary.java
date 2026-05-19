@@ -30,31 +30,5 @@ public class UserLibrary {
     private Role role;
 }
 
-@Embeddable
-@Getter
-@Setter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-class UserLibraryId implements java.io.Serializable {
-    private Integer userId;
-    private Integer libraryId;
 
-    @Override
-    public boolean equals(Object o)
-    {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        UserLibraryId UserLibraryId = (UserLibraryId) o;
-        return Objects.equals(userId, UserLibraryId.userId) && Objects.equals(libraryId, UserLibraryId.libraryId);
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return Objects.hash(userId, libraryId);
-    }
-}
 

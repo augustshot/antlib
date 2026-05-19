@@ -1,0 +1,139 @@
+/* css/books.css */
+
+/* Контейнер с карточками */
+.books-container {
+    margin-top: 2rem;
+}
+
+/* Карточка книги */
+.book-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    height: 100%;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.book-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+/* Обложка книги */
+.book-cover {
+    height: 250px;
+    object-fit: cover;
+    border-bottom: 1px solid #dee2e6;
+    background-color: #f8f9fa;
+}
+
+/* Заглушка для отсутствующей обложки */
+.book-cover-placeholder {
+    height: 250px;
+    background-color: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #adb5bd;
+    font-size: 3rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+/* Название книги */
+.book-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    line-height: 1.3;
+}
+
+.book-title a {
+    text-decoration: none;
+    color: #198754;
+}
+
+.book-title a:hover {
+    text-decoration: underline;
+}
+
+/* Автор книги */
+.book-author {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-bottom: 0.75rem;
+}
+
+.book-author a {
+    text-decoration: none;
+    color: #6c757d;
+}
+
+.book-author a:hover {
+    text-decoration: underline;
+    color: #198754;
+}
+
+/* Детали книги */
+.book-detail {
+    font-size: 0.8rem;
+    margin-bottom: 0.3rem;
+}
+
+.book-detail-label {
+    font-weight: 500;
+    color: #495057;
+}
+
+/* Рейтинг звёздами */
+.book-rating {
+    font-size: 0.9rem;
+    color: #ffc107;
+}
+
+/* Пагинация */
+.pagination-container {
+    margin-top: 2rem;
+}
+
+.pagination-container .page-link {
+    color: #198754;
+}
+
+.pagination-container .page-item.active .page-link {
+    background-color: #198754;
+    border-color: #198754;
+    color: white;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .book-cover,
+    .book-cover-placeholder {
+        height: 180px;
+    }
+
+    .book-title {
+        font-size: 1rem;
+    }
+
+    .book-author {
+        font-size: 0.8rem;
+    }
+}
+
+.form-section {
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .form-section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #2e7d32;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e0e8e0;
+        }
+        .required-field::after {
+            content: " *";
+            color: #dc3545;
+        }

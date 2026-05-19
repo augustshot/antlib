@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ru"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Изменить книгу</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/books.css}">
+</head>
+<body>
+
+<div th:replace="~{header :: header}"></div>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-success mb-0">Изменить книгу</h2>
+    </div>
+
+    <!-- Одна форма с th:object UserBook -->
+    <form th:action="@{/books/update}" th:object="${userBook}" th:method="post">
+
+        <!-- Секция: Основная информация (BookDescription) -->
+        <div class="form-section">
+            <div class="form-section-title">Основная информация</div>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="title" class="form-label required-field">Название</label>
+                    <input type="text" class="form-control" id="title" th:field="*{bookDescription.title}">
+                    <span th:if="${#fields.hasErrors('bookDescription.title')}" th:errors="*{bookDescription.title}" class="text-danger error-text"></span>
+                </div>
+                <div class="col-md-6">
+                    <label for="author" class="form-label required-field">Автор</label>
+                    <input type="text" class="form-control" id="author" th:field="*{bookDescription.author}">
+                    <span th:if="${#fields.hasErrors('bookDescription.author')}" th:errors="*{bookDescription.author}" class="text-danger error-text"></span>
+                </div>
+            </div>
+            <div class="row g-3 mt-2">
+                <div class="col-md-3">
+                    <label for="ISBN" class="form-label">ISBN</label>
+                    <input type="text" class="form-control" id="ISBN" th:field="*{bookDescription.ISBN}" placeholder="10- или 13-значный номер">
+                </div>
+                <div class="col-md-2">
+                    <label for="year" class="form-label">Год издания</label>
+                    <input type="number" class="form-control" id="year" th:field="*{bookDescription.year}" placeholder="2024">
+                    <span th:if="${#fields.hasErrors('bookDescription.year')}" th:errors="*{bookDescription.year}" class="text-danger error-text"></span>
+                </div>
+                <div class="col-md-2">
+                    <label for="pages" class="form-label required-field">Страниц</label>
+                    <input type="number" class="form-control" id="pages" th:field="*{bookDescription.pages}" placeholder="300">
+                    <span th:if="${#fields.hasErrors('bookDescription.pages')}" th:errors="*{bookDescription.pages}" class="text-danger error-text"></span>
+                </div>
+                <div class="col-md-2">
+                    <label for="language" class="form-label">Язык</label>
+                    <input type="text" class="form-control" id="language" th:field="*{bookDescription.language}" placeholder="Русский">
+                </div>
+                <div class="col-md-3">
+                    <label for="publisher" class="form-label">Издательство</label>
+                    <input type="text" class="form-control" id="publisher" th:field="*{bookDescription.publisher}" placeholder="Название издательства">
+                </div>
+            </div>
+            <div class="row g-3 mt-2">
+                <div class="col-12">
+                    <label for="cover" class="form-label">Обложка (URL)</label>
+                    <input type="url" class="form-control" id="cover" th:field="*{bookDescription.cover}" placeholder="https://...">
+                </div>
+            </div>
+            <div class="row g-3 mt-2">
+                <div class="col-12">
+                    <label for="description" class="form-label">Описание</label>
+                    <textarea class="form-control" id="description" th:field="*{bookDescription.description}" rows="4" placeholder="Краткое описание книги..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Секция: Отметки пользователя (UserBookMark) -->
+        <div class="form-section">
+            <div class="form-section-title">Мои отметки</div>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="rating" class="form-label">Оценка</label>
+                    <select class="form-select" id="rating" th:field="*{userBookMark.rating}">
+                        <option value="">Нет оценки</option>
+                        <option th:each="r : ${#numbers.sequence(1, 5)}"
+                                th:value="${r}"
+                                th:text="${r}">1</option>
+                    </select>
+                    <span th:if="${#fields.hasErrors('userBookMark.rating')}" th:errors="*{userBookMark.rating}" class="text-danger error-text"></span>
+                </div>
+                <div class="col-md-4">
+                    <label for="source" class="form-label">Источник</label>
+                    <select class="form-select" id="source" th:field="*{userBookMark.source}">
+                        <option th:each="src : ${sources}"
+                                th:value="${src}"
+                                th:text="${src.value}">OWNED</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="status" class="form-label">Статус чтения</label>
+                    <select class="form-select" id="status" th:field="*{userBookMark.status}">
+                        <option th:each="st : ${statuses}"
+                                th:value="${st}"
+                                th:text="${st.value}">PLANNED</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row g-3 mt-2">
+                <div class="col-md-6">
+                    <label for="dateStart" class="form-label">Дата начала чтения</label>
+                    <input type="date" class="form-control" id="dateStart" th:field="*{userBookMark.dateStart}">
+                    <span th:if="${#fields.hasErrors('userBookMark.dateStart')}" th:errors="*{userBookMark.dateStart}" class="text-danger error-text"></span>
+                </div>
+                <div class="col-md-6">
+                    <label for="dateFinish" class="form-label">Дата завершения</label>
+                    <input type="date" class="form-control" id="dateFinish" th:field="*{userBookMark.dateFinish}">
+                    <span th:if="${#fields.hasErrors('userBookMark.dateFinish')}" th:errors="*{userBookMark.dateFinish}" class="text-danger error-text"></span>
+                </div>
+            </div>
+            <div class="row g-3 mt-2">
+                <div class="col-12">
+                    <label for="review" class="form-label">Рецензия / Заметки</label>
+                    <textarea class="form-control" id="review" th:field="*{userBookMark.review}" rows="3" placeholder="Ваши впечатления о книге..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Кнопки -->
+        <div class="d-flex justify-content-end gap-3 mt-4 mb-5">
+            <a th:href="@{/books/${userBookMark.id}}" class="btn btn-secondary px-4">Отмена</a>
+            <button type="submit" class="btn btn-success px-4">Сохранить</button>
+        </div>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
