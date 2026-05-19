@@ -1,0 +1,140 @@
+CREATE TABLE IF NOT EXISTS `user` (
+	`id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+	`login` VARCHAR(255) NOT NULL,
+	`password` VARCHAR(255) NOT NULL,
+	`email` VARCHAR(255) NOT NULL,
+	PRIMARY KEY(`id`)
+);
+
+
+CREATE TABLE IF NOT EXISTS `book_description` (
+	`id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+	`title` VARCHAR(255) NOT NULL,
+	`author` VARCHAR(255) NOT NULL,
+	`year` INTEGER NOT NULL,
+	`ISBN` VARCHAR(255) NOT NULL,
+	`pages` INTEGER NOT NULL,
+	`language` VARCHAR(255),
+	`publisher` VARCHAR(255),
+	`cover` VARCHAR(255),
+	`description` VARCHAR(255),
+	PRIMARY KEY(`id`)
+);
+
+
+CREATE TABLE IF NOT EXISTS `collection` (
+	`id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+	`user_id` INTEGER UNSIGNED NOT NULL,
+	`name` VARCHAR(255) NOT NULL,
+	`description` VARCHAR(255),
+	PRIMARY KEY(`id`)
+);
+
+
+CREATE TABLE IF NOT EXISTS `book_collection` (
+	`collection_id` INTEGER UNSIGNED NOT NULL,
+	`user_book_mark_id` INTEGER UNSIGNED NOT NULL,
+	PRIMARY KEY(`collection_id`, `user_book_mark_id`)
+);
+
+
+CREATE TABLE IF NOT EXISTS `user_book_mark` (
+	`id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+	`user_id` INTEGER UNSIGNED NOT NULL,
+	`book_description_id` INTEGER UNSIGNED NOT NULL,
+	`rating` INTEGER,
+	`source` ENUM('EBOOK', 'SHARED', 'OWNED', 'BORROWED'),
+	`status` ENUM('READING', 'PLANNED', 'POSTPONED', 'FINISHED'),
+	`date_start` DATE,
+	`date_finish` DATE,
+	PRIMARY KEY(`id`)
+);
+
+
+CREATE TABLE IF NOT EXISTS `library` (
+	`id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+	`name` VARCHAR(255) NOT NULL,
+	`invite_code` VARCHAR(255) NOT NULL,
+	PRIMARY KEY(`id`)
+);
+
+
+CREATE TABLE IF NOT EXISTS `user_library` (
+	`user_id` INTEGER UNSIGNED NOT NULL,
+	`library_id` INTEGER UNSIGNED NOT NULL,
+	`role` ENUM('OWNER', 'MEMBER') NOT NULL,
+	PRIMARY KEY(`user_id`, `library_id`)
+);
+
+
+CREATE TABLE IF NOT EXISTS `room` (
+	`id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+	`name` VARCHAR(255) NOT NULL,
+	`library_id` INTEGER UNSIGNED NOT NULL,
+	PRIMARY KEY(`id`)
+);
+
+
+CREATE TABLE IF NOT EXISTS `shelf` (
+	`id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+	`room_id` INTEGER UNSIGNED NOT NULL,
+	`width` INTEGER NOT NULL,
+	`height` INTEGER NOT NULL,
+	`position_x` FLOAT NOT NULL,
+	`position_y` FLOAT NOT NULL,
+	PRIMARY KEY(`id`)
+);
+
+
+CREATE TABLE IF NOT EXISTS `shelf_book` (
+	`id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+	`position` INTEGER NOT NULL,
+	`shelf_id` INTEGER UNSIGNED NOT NULL,
+	`book_instance_id` INTEGER UNSIGNED NOT NULL,
+	PRIMARY KEY(`id`)
+);
+
+
+CREATE TABLE IF NOT EXISTS `book_instance` (
+	`id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+	`book_description_id` INTEGER UNSIGNED NOT NULL,
+	PRIMARY KEY(`id`)
+);
+
+
+ALTER TABLE `user_library`
+ADD FOREIGN KEY(`user_id`) REFERENCES `user`(`id`)
+ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE `user_book_mark`
+ADD FOREIGN KEY(`user_id`) REFERENCES `user`(`id`)
+ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE `user_library`
+ADD FOREIGN KEY(`library_id`) REFERENCES `library`(`id`)
+ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE `collection`
+ADD FOREIGN KEY(`user_id`) REFERENCES `user`(`id`)
+ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE `book_collection`
+ADD FOREIGN KEY(`collection_id`) REFERENCES `collection`(`id`)
+ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE `book_collection`
+ADD FOREIGN KEY(`user_book_mark_id`) REFERENCES `user_book_mark`(`id`)
+ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE `user_book_mark`
+ADD FOREIGN KEY(`book_description_id`) REFERENCES `book_description`(`id`)
+ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE `shelf_book`
+ADD FOREIGN KEY(`shelf_id`) REFERENCES `shelf`(`id`)
+ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE `shelf`
+ADD FOREIGN KEY(`room_id`) REFERENCES `room`(`id`)
+ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE `room`
+ADD FOREIGN KEY(`library_id`) REFERENCES `library`(`id`)
+ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE `shelf_book`
+ADD FOREIGN KEY(`book_instance_id`) REFERENCES `book_instance`(`id`)
+ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE `book_instance`
+ADD FOREIGN KEY(`book_description_id`) REFERENCES `book_description`(`id`)
+ON UPDATE NO ACTION ON DELETE NO ACTION;
