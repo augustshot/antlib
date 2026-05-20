@@ -1,113 +1,130 @@
 window.addEventListener("load", init);
 
-    function init(){
+function init(){
 
-        const isbnTextarea = document.getElementById('isbnInput');
-        const hiddenIsbn = document.getElementById('hiddenIsbn');
-        const searchBtn = document.getElementById('searchByIsbnBtn');
-        const addBtn = document.getElementById('addByISBNBtn');
-        const form = document.getElementById('isbnForm');
+    const isbnInput = document.getElementById('isbnInput');
+    const searchBtn = document.getElementById('searchByIsbnBtn');
+    const addBtn = document.getElementById('addByISBNBtn');
+    const form = document.getElementById('isbnForm');
+    const hiddenIsbn = document.getElementById('hiddenIsbn');
+    const formText = document.getElementById('isbnFormText');
 
+    const ISBN13_PATTERN = /^(978|979)(-?\d){10}$/;
+    const ISBN10_PATTERN = /^(\d-?){9}\d$/;
 
-        // Регулярные выражения для валидации ISBN
-        const ISBN13_PATTERN = /^(978|979)(-?\d){10}$/;
-        const ISBN10_PATTERN = /^(\d-?){9}\d$/;
+    function cleanIsbn(isbn) {
+        return isbn.replace(/[-\s]/g, '');
+    }
 
-        function cleanIsbn(isbn) {
-            return isbn.replace(/[-\s]/g, '');
-        }
+    function isValidIsbn(isbn) {
+        const trimmed = isbn.trim();
+        if (!trimmed) return false;
+        return ISBN13_PATTERN.test(trimmed) || ISBN10_PATTERN.test(trimmed);
+    }
 
-        function isValidIsbn(isbn) {
-            const trimmed = isbn.trim();
-            if (!trimmed) return false;
-            return ISBN13_PATTERN.test(trimmed) || ISBN10_PATTERN.test(trimmed);
-        }
-
-        function isOnlyDigits(str) {
-            return /^\d+$/.test(str);
-        }
-
-        function showMessage(containerId, message, type) {
-            const container = document.getElementById(containerId);
-            if (!container) return;
-            container.innerHTML = '';
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
-            alertDiv.innerHTML = `${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
-            container.appendChild(alertDiv);
-        }
-
-        function clearMessages() {
-            const container = document.getElementById('validationMessages');
-            if (container) container.innerHTML = '';
-        }
-
-        // Привязываем событие на кнопку поиска
-        if (searchBtn && form) {
-            searchBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-
-
-                const rawValue = isbnTextarea ? isbnTextarea.value : '';
-                clearMessages();
-
-                if (!rawValue.trim()) {
-                    showMessage('validationMessages', 'Введите ISBN', 'danger');
-                    return;
-                }
-
-                // Парсим по переносам строк
-                const lines = rawValue.split(/\r?\n/);
-                const validIsbns = [];
-                const invalidIsbns = [];
-
-                for (const line of lines) {
-                    const trimmed = line.trim();
-                    if (trimmed === '') continue;
-
-                    const cleaned = cleanIsbn(trimmed);
-
-                    if (!isOnlyDigits(cleaned)) {
-                        invalidIsbns.push(trimmed);
-                        continue;
-                    }
-
-                    if (isValidIsbn(trimmed)) {
-                        validIsbns.push(cleaned);
-                    } else {
-                        invalidIsbns.push(trimmed);
-                    }
-                }
-
-                if (invalidIsbns.length > 0) {
-                    showMessage('validationMessages', 'Некорректный формат ISBN: ' + invalidIsbns.join(', '), 'danger');
-                    return;
-                }
-
-                if (validIsbns.length > 1) {
-                    showMessage('validationMessages', 'Найдено ' + validIsbns.length + ' ISBN. Оставьте только один ISBN', 'warning');
-                    return;
-                }
-
-
-                if (hiddenIsbn) {
-                    hiddenIsbn.value = validIsbns[0];
-                }
-                if (isbnTextarea) {
-                    isbnTextarea.value = '';
-                }
-
-                clearMessages();
-                form.submit();
-            });
-        }
-
-        // Привязываем событие на кнопку открытия модального окна
-        if (addBtn) {
-            addBtn.addEventListener('click', function() {
-                if (isbnTextarea) isbnTextarea.value = '';
-                if (hiddenIsbn) hiddenIsbn.value = '';
-                clearMessages();
-            });
+    function setValid(isValid, message) {
+        if (isValid) {
+            isbnInput.classList.remove('is-invalid');
+            isbnInput.classList.add('is-valid');
+            if (formText) {
+                formText.classList.remove('text-danger');
+                formText.classList.add('text-success');
+                formText.innerHTML = message || 'ISBN корректен';
+            }
+        } else {
+            isbnInput.classList.remove('is-valid');
+            isbnInput.classList.add('is-invalid');
+            if (formText) {
+                formText.classList.remove('text-success');
+                formText.classList.add('text-danger');
+                formText.innerHTML = message || 'Некорректный формат ISBN';
+            }
         }
     }
+
+    function resetValidation() {
+        isbnInput.classList.remove('is-valid', 'is-invalid');
+        if (formText) {
+            formText.classList.remove('text-success', 'text-danger');
+            formText.innerHTML = 'Формат ISBN: 10 или 13 цифр';
+        }
+    }
+
+    function submitForm() {
+        const rawValue = isbnInput ? isbnInput.value : '';
+
+        if (!rawValue.trim()) {
+            setValid(false, 'Введите ISBN');
+            return false;
+        }
+
+        const cleaned = cleanIsbn(rawValue);
+
+        if (!/^\d+$/.test(cleaned)) {
+            setValid(false, 'Некорректный формат ISBN');
+            return false;
+        }
+
+        if (!isValidIsbn(rawValue)) {
+            setValid(false, 'Некорректный формат ISBN');
+            return false;
+        }
+
+        if (hiddenIsbn) {
+            hiddenIsbn.value = cleaned;
+        }
+        if (isbnInput) {
+            isbnInput.value = '';
+        }
+
+        form.submit();
+        return true;
+    }
+
+    if (isbnInput) {
+        isbnInput.addEventListener('input', function() {
+            const rawValue = isbnInput.value;
+
+            if (!rawValue.trim()) {
+                resetValidation();
+                return;
+            }
+
+            const cleaned = cleanIsbn(rawValue);
+
+            if (!/^\d+$/.test(cleaned)) {
+                setValid(false, 'Некорректный формат ISBN');
+                return;
+            }
+
+            if (isValidIsbn(rawValue)) {
+                setValid(true, 'ISBN корректен');
+            } else {
+                let msg = 'Некорректный формат ISBN';
+                setValid(false, msg);
+            }
+        });
+
+        // Отправка по Enter
+        isbnInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                submitForm();
+            }
+        });
+    }
+
+    if (searchBtn) {
+        searchBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            submitForm();
+        });
+    }
+
+//    if (addBtn) {
+//        addBtn.addEventListener('click', function() {
+//            if (isbnInput) isbnInput.value = '';
+//            resetValidation();
+//        });
+//    }
+}

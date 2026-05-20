@@ -6,15 +6,10 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import ru.isu.antlib.model.BookDescription;
 
-import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class BookParser {
-
-    public static void main(String[] args) {
-
-    }
-
     public static BookDescription findByISBN(String ISBN){
         try {
             // Загрузка HTML файла (можно заменить на connection для URL)
@@ -61,6 +56,7 @@ public class BookParser {
                 Element authorLink = feature.selectFirst("a.text-blue-800");
                 if (authorLink != null) {
                     author = authorLink.text();
+                    author = author.indexOf(' ') > 0 ? author.substring(author.indexOf(' ') + 1) + " " + author.substring(0, author.indexOf(' ')) : author;
                     book.setAuthor(author);
                 }
                 break;

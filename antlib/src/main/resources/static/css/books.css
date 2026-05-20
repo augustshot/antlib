@@ -1,4 +1,4 @@
-/* css/books.css */
+
 
 /* Контейнер с карточками */
 .books-container {
@@ -104,21 +104,6 @@
     color: white;
 }
 
-/* Адаптивность */
-@media (max-width: 768px) {
-    .book-cover,
-    .book-cover-placeholder {
-        height: 180px;
-    }
-
-    .book-title {
-        font-size: 1rem;
-    }
-
-    .book-author {
-        font-size: 0.8rem;
-    }
-}
 
 .form-section {
             border-radius: 12px;
@@ -137,17 +122,11 @@
             content: " *";
             color: #dc3545;
         }
+#errorMessage{
+    width:50%
+}
 
-        /* Кнопки справа, не на всю ширину */
-        .col-md-3 {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-        }
-
-        .button-group-vertical {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            width: auto;
-        }
+.books-container,
+.row-cols-1 {
+    margin-bottom: 3rem;
+}

@@ -7,8 +7,8 @@
     <title>Мои книги</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
-    <link th:href="@{/css/books.css}" rel="stylesheet"/>
-
+    <link th:href="@{/css/books.css}" ref = "/css/books.css" rel="stylesheet"/>
+    <script th:src="@{/js/showMultipleIsbnResult.js}" src = "/js/showMultipleIsbnResult.js" type="text/javascript"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
 </head>
@@ -132,7 +132,7 @@
                 <div class="card-body">
                     <!-- Название -->
                     <div class="book-title">
-                        <a th:href="@{/books/{id}(id=${userBookMark.id})}"
+                        <a th:href="@{/books/book/{id}(id=${userBookMark.id})}"
                            th:text="${userBookMark.bookDescription.title}">
                             Название книги
                         </a>
@@ -149,7 +149,10 @@
                     <!-- Статус -->
                     <div class="book-detail">
                         <span class="book-detail-label">Статус:</span>
-                        <span th:text="${userBookMark.status.value}"></span>
+                        <span th:if="${userBookMark.status != null}" class="book-status">
+                            <span th:text="${userBookMark.status.value}"></span>
+                        </span>
+                        <span th:unless="${userBookMark.status != null}">—</span>
                     </div>
 
                     <!-- Оценка (звёздами или числом) -->
@@ -164,7 +167,10 @@
                     <!-- Источник -->
                     <div class="book-detail">
                         <span class="book-detail-label">Источник:</span>
-                        <span th:text="${userBookMark.source.value}"></span>
+                        <span th:if="${userBookMark.source != null}" class="book-source">
+                            <span th:text="${userBookMark.source.value}"></span>
+                        </span>
+                        <span th:unless="${userBookMark.source != null}">—</span>
                     </div>
                 </div>
             </div>
@@ -196,6 +202,43 @@
                 </li>
             </ul>
         </nav>
+    </div>
+</div>
+
+<input type="hidden" id="showResultFlag" th:value="${showModal}" />
+<!-- Модальное окно для отображения результатов добавления нескольких книг -->
+<div class="modal fade" id="resultModal" tabindex="-1" aria-labelledby="resultModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="resultModalLabel">Добавление по нескольким ISBN</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <p th:if="${summaryMessage != null}" th:text="${summaryMessage}" class="fw-bold mb-3"></p>
+
+                <div th:if="${added != null and !added.isEmpty()}" class="mb-3">
+                    <strong>Добавлены успешно:</strong>
+                    <ul class="mb-0 mt-1">
+                        <li th:each="isbn : ${added}" th:text="${isbn}"></li>
+                    </ul>
+                </div>
+
+                <div th:if="${duplicates != null and !duplicates.isEmpty()}" class="mb-3">
+                    <strong>Уже есть в библиотеке:</strong>
+                    <ul class="mb-0 mt-1">
+                        <li th:each="isbn : ${duplicates}" th:text="${isbn}"></li>
+                    </ul>
+                </div>
+
+                <div th:if="${skipped != null and !skipped.isEmpty()}" class="mb-3">
+                    <strong>Не найдены:</strong>
+                    <ul class="mb-0 mt-1">
+                        <li th:each="isbn : ${skipped}" th:text="${isbn}"></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
