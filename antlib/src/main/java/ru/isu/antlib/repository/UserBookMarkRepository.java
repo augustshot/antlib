@@ -1,6 +1,7 @@
 package ru.isu.antlib.repository;
 
 import jakarta.validation.constraints.NotNull;
+import org.hibernate.annotations.DialectOverride;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,6 +23,8 @@ public interface UserBookMarkRepository extends JpaRepository<UserBookMark, Inte
     @Query("select ubm from UserBookMark ubm join fetch ubm.bookDescription where ubm.user.id = :userId")
     Page<UserBookMark> findAllBooks(@Param("userId") Integer userId, Pageable pageable);
 
+    @Query("select ubm from UserBookMark ubm join fetch ubm.bookDescription where ubm.user.id = :userId and ubm.bookDescription.ISBN = :ISBN")
+    UserBookMark findBookByUserIdAndISBN(@Param("userId") Integer userId, @Param("ISBN") String isbn);
 
 
     // фильтры - specification?

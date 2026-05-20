@@ -24,4 +24,8 @@ public class UserBookMarkService {
     public UserBookMark getByUserBookMarkId(Integer id){
         return userBookMarkRepository.findBookByUserBookMarkId(id);
     }
+
+    public UserBookMark getByUserIdAndISBN(Integer userId, String isbn){
+        return userBookMarkRepository.findBookByUserIdAndISBN(userId, isbn);
+    }
 }

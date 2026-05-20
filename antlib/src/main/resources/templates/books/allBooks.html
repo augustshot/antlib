@@ -29,61 +29,81 @@
         </a>
     </div>
 
-    <!-- Фильтры (закомментированы, как в оригинале) -->
+    <!-- Фильтры -->
     <div class="card mb-4">
         <div class="card-header bg-success text-white">
             <h5 class="mb-0">Фильтры</h5>
         </div>
         <div class="card-body">
-            <form method="get" action="#" th:action="@{/books}" class="row g-2 align-items-end">
-                <!-- Название -->
-                <div class="col">
-                    <label for="title" class="form-label">Название</label>
-                    <input type="text" class="form-control form-control-sm" id="title" name="title" th:value="${param.title}" placeholder="Введите название">
-                </div>
+            <form method="get" action="#" th:action="@{/books}">
+                <div class="row align-items-center">
+                    <!-- Левая колонка: фильтры -->
+                    <div class="col-md-10">
+                        <!-- Первая строка: информация о книге -->
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-3">
+                                <label for="title" class="form-label">Название</label>
+                                <input type="text" class="form-control form-control-sm" id="title" name="title" th:value="${param.title}" placeholder="Введите название">
+                            </div>
 
-                <!-- Автор -->
-                <div class="col">
-                    <label for="author" class="form-label">Автор</label>
-                    <input type="text" class="form-control form-control-sm" id="author" name="author" th:value="${param.author}" placeholder="Введите автора">
-                </div>
+                            <div class="col-md-3">
+                                <label for="author" class="form-label">Автор</label>
+                                <input type="text" class="form-control form-control-sm" id="author" name="author" th:value="${param.author}" placeholder="Введите автора">
+                            </div>
 
-                <!-- Оценка -->
-                <div class="col">
-                    <label class="form-label">Оценка</label>
-                    <div class="d-flex gap-1 align-items-center">
-                        <select class="form-select form-select-sm" id="ratingFrom" name="ratingFrom" style="width: 75px;">
-                            <option value="">от</option>
-                            <option th:each="r : ${#numbers.sequence(1, 5)}" th:value="${r}" th:text="${r}">1</option>
-                        </select>
-                        <select class="form-select form-select-sm" id="ratingTo" name="ratingTo" style="width: 75px;">
-                            <option value="">до</option>
-                            <option th:each="r : ${#numbers.sequence(1, 5)}" th:value="${r}" th:text="${r}">5</option>
-                        </select>
+                            <div class="col-md-3">
+                                <label for="language" class="form-label">Язык</label>
+                                <input type="text" class="form-control form-control-sm" id="language" name="language" th:value="${param.language}" placeholder="Русский, Английский...">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label for="isbn" class="form-label">ISBN</label>
+                                <input type="text" class="form-control form-control-sm" id="isbn" name="isbn" th:value="${param.isbn}" placeholder="10 или 13 цифр">
+                            </div>
+                        </div>
+
+                        <!-- Вторая строка: пользовательские отметки -->
+                        <div class="row g-2">
+                            <div class="col-md-4">
+                                <label class="form-label">Оценка</label>
+                                <div class="d-flex gap-2 align-items-center">
+                                    <select class="form-select form-select-sm" id="ratingFrom" name="ratingFrom">
+                                        <option value="">от</option>
+                                        <option th:each="r : ${#numbers.sequence(1, 5)}" th:value="${r}" th:text="${r}">1</option>
+                                    </select>
+                                    <span class="text-muted">—</span>
+                                    <select class="form-select form-select-sm" id="ratingTo" name="ratingTo">
+                                        <option value="">до</option>
+                                        <option th:each="r : ${#numbers.sequence(1, 5)}" th:value="${r}" th:text="${r}">5</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label for="status" class="form-label">Статус</label>
+                                <select class="form-select form-select-sm" id="status" name="status">
+                                    <option value="">Все</option>
+                                    <option th:each="st : ${statuses}" th:value="${st}" th:text="${st.value}">READING</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label for="source" class="form-label">Источник</label>
+                                <select class="form-select form-select-sm" id="source" name="source">
+                                    <option value="">Все</option>
+                                    <option th:each="src : ${sources}" th:value="${src}" th:text="${src.value}">EBOOK</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Источник -->
-                <div class="col">
-                    <label for="source" class="form-label">Источник</label>
-                    <select class="form-select form-select-sm" id="source" name="source">
-                        <option value="">Все</option>
-                        <option th:each="src : ${sources}" th:value="${src}" th:text="${src.value}">EBOOK</option>
-                    </select>
-                </div>
-
-                <!-- Статус -->
-                <div class="col">
-                    <label for="status" class="form-label">Статус</label>
-                    <select class="form-select form-select-sm" id="status" name="status">
-                        <option value="">Все</option>
-                        <option th:each="st : ${statuses}" th:value="${st}" th:text="${st.value}">READING</option>
-                    </select>
-                </div>
-
-                <!-- Кнопка -->
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-success btn-sm px-3">Показать</button>
+                    <!-- Правая колонка: кнопки (центрированы по вертикали) -->
+                    <div class="col-auto d-flex justify-content-end ms-auto">
+                        <div class="button-group-vertical">
+                            <button type="submit" class="btn btn-success btn-sm w-100 mb-2">Показать</button>
+                            <a th:href="@{/books/}" class="btn btn-outline-secondary btn-sm w-100">Сбросить</a>
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>

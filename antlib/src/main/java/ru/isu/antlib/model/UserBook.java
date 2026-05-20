@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 public class UserBook {
     @Valid
-    private UserBookMark userBookMark;
+    private UserBookMark userBookMark = new UserBookMark();
     @Valid
-    private BookDescription bookDescription;
+    private BookDescription bookDescription = new BookDescription();
 }

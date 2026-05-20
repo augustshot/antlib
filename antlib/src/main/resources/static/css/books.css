@@ -137,3 +137,17 @@
             content: " *";
             color: #dc3545;
         }
+
+        /* Кнопки справа, не на всю ширину */
+        .col-md-3 {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .button-group-vertical {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: auto;
+        }

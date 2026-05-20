@@ -7,7 +7,7 @@ import ru.isu.antlib.model.UserBookMark;
 
 import java.time.LocalDate;
 
-public class UserBookMarkDateValidator implements Validator {
+public class UserBookMarkValidator implements Validator {
     @Override
     public boolean supports(Class<?> type) {
         return UserBook.class.equals(type);

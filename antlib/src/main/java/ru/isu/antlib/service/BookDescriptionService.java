@@ -13,4 +13,8 @@ public class BookDescriptionService {
     public BookDescription save(BookDescription bookDescription) {
         return bookDescriptionRepository.save(bookDescription);
     }
+
+    public BookDescription findByISNBVerified(String isbn){
+        return bookDescriptionRepository.findByISBNAndVerifiedTrue(isbn);
+    }
 }
