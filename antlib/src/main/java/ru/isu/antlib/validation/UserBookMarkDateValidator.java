@@ -23,9 +23,6 @@ public class UserBookMarkDateValidator implements Validator {
         if(start==null && finish!=null){
             e.rejectValue("userBookMark.dateFinish", "error.date.error", "Введите обе даты");
         }
-        if(start!=null && finish==null){
-            e.rejectValue("userBookMark.dateStart", "error.date.error", "Введите обе даты");
-        }
         if (start!=null && finish!=null && start.isAfter(finish)) {
             e.rejectValue("userBookMark.dateFinish", "error.date.error", "Дата окончания не может быть раньше даты начала");
         }
