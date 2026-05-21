@@ -74,15 +74,18 @@ public class BookController {
     public String books(Model model, Pageable page, Sort sort){
         Integer userId = 1;
 
-        Pageable pageNew = PageRequest.of(page.getPageNumber(), 30, page.getSort());
+        Pageable pageNew = PageRequest.of(page.getPageNumber(), 20, page.getSort());
 
         Sort.Order order = null;
-        if(sort!=null && sort.iterator().hasNext()){
+        if (sort != null && sort.iterator().hasNext()) {
             order = sort.iterator().next();
+        } else {
+            order = new Sort.Order(Sort.Direction.ASC, "bookDescription.title");
+            sort = Sort.by(order);
         }
 
-        model.addAttribute("sort", (order!=null)?order.getProperty():"");
-        model.addAttribute("dir", (order!=null)?order.getDirection():"");
+        model.addAttribute("sort", (order != null) ? order.getProperty() : "");
+        model.addAttribute("dir", (order != null) ? order.getDirection().toString() : "");
         model.addAttribute("page", userBookMarkRepository.findAllBooks(userId, pageNew));
 
         return "books/allBooks";
@@ -134,7 +137,6 @@ public class BookController {
         for (String s : isbnArray) {
             String cleaned = s.trim().replaceAll("[\\s-]", "");
             if (!cleaned.isEmpty()) {
-                cleaned = (cleaned.length() == 10 ? "978" + cleaned : cleaned);
                 isbnList.add(cleaned);
             }
         }
@@ -178,7 +180,6 @@ public class BookController {
                 }
             }
         }
-
         redirectAttributes.addFlashAttribute("added", added);
         redirectAttributes.addFlashAttribute("skipped", skipped);
         redirectAttributes.addFlashAttribute("duplicates", duplicates);
@@ -224,7 +225,6 @@ public class BookController {
             bookDescriptionService.save(book);
             mark.setBookDescription(book);
         }
-
 
         userBookMarkService.save(mark);
 

@@ -9,7 +9,7 @@ function init(){
     const hiddenIsbn = document.getElementById('hiddenIsbn');
     const formText = document.getElementById('isbnFormText');
 
-    const ISBN13_PATTERN = /^(978|979)(-?\d){10}$/;
+    const ISBN13_PATTERN = /^(978)(-?\d){10}$/;
     const ISBN10_PATTERN = /^(\d-?){9}\d$/;
 
     function cleanIsbn(isbn) {
@@ -71,7 +71,7 @@ function init(){
         }
 
         if (hiddenIsbn) {
-            hiddenIsbn.value = cleaned;
+            hiddenIsbn.value = (cleaned.length == 10 ? "978"+cleaned : cleaned);
         }
         if (isbnInput) {
             isbnInput.value = '';

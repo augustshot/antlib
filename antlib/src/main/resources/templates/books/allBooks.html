@@ -110,7 +110,7 @@
     </div>
 
     <!-- Сетка карточек: 6 карточек в строке -->
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-6 g-4">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
         <div th:each="userBookMark : ${page.content}" class="col">
             <div class="card book-card">
                 <!-- Обложка -->
@@ -177,28 +177,27 @@
         </div>
     </div>
 
-    <!-- Пагинация -->
-    <div th:unless="${page.totalPages < 2}" class="pagination-container text-center mt-4">
+    <div class="text-center mt-3">
         <nav>
             <ul class="pagination justify-content-center">
                 <li th:class="${page.first} ? 'page-item disabled' : 'page-item'">
-                    <a th:if="!page.first"
-                       th:href="@{/books(page=${page.number - 1})}"
-                       class="page-link">Назад</a>
-                    <span th:if="${page.first}" class="page-link">Назад</span>
+                    <a th:if="${!page.first}"
+                       th:href="@{/books/(page=${page.number - 1}, sort=${sort}, dir=${dir})}"
+                       class="page-link text-success">Назад</a>
+                    <span th:if="${page.first}" class="page-link text-secondary">Назад</span>
                 </li>
 
                 <li class="page-item disabled">
-                    <span class="page-link">
-                        <span th:text="${page.number + 1}"></span> / <span th:text="${page.totalPages}"></span>
-                    </span>
+                <span class="page-link">
+                    <span th:text="${page.number + 1}"></span> / <span th:text="${page.totalPages}"></span>
+                </span>
                 </li>
 
                 <li th:class="${page.last} ? 'page-item disabled' : 'page-item'">
-                    <a th:if="!page.last"
-                       th:href="@{/books(page=${page.number + 1})}"
-                       class="page-link">Далее</a>
-                    <span th:if="${page.last}" class="page-link">Далее</span>
+                    <a th:if="${!page.last}"
+                       th:href="@{/books/(page=${page.number + 1}, sort=${sort}, dir=${dir})}"
+                       class="page-link text-success">Далее</a>
+                    <span th:if="${page.last}" class="page-link text-secondary">Далее</span>
                 </li>
             </ul>
         </nav>

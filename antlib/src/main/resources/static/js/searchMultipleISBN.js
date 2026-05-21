@@ -93,7 +93,7 @@ function init() {
 
 
         if (hiddenIsbn) {
-            hiddenIsbn.value = validIsbns.join('\n');
+            hiddenIsbn.value = validIsbns.map(isbn => isbn.length === 10 ? "978" + isbn : isbn).join('\n');
         }
         if (isbnTextarea) {
             isbnTextarea.value = '';
