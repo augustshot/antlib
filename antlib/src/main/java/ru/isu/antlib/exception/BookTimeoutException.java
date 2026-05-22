@@ -1,4 +1,4 @@
-package ru.isu.antlib.service;
+package ru.isu.antlib.exception;
 
 public class BookTimeoutException extends RuntimeException{
     public BookTimeoutException(String message) {

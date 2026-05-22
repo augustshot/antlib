@@ -4,6 +4,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import ru.isu.antlib.exception.BookNotFoundException;
+import ru.isu.antlib.exception.BookTimeoutException;
 
 import java.io.IOException;
 
