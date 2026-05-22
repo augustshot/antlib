@@ -35,74 +35,84 @@
             <h5 class="mb-0">Фильтры</h5>
         </div>
         <div class="card-body">
-            <form method="get" action="#" th:action="@{/books}">
-                <div class="row align-items-center">
-                    <!-- Левая колонка: фильтры -->
-                    <div class="col-md-10">
-                        <!-- Первая строка: информация о книге -->
-                        <div class="row g-2 mb-3">
-                            <div class="col-md-3">
-                                <label for="title" class="form-label">Название</label>
-                                <input type="text" class="form-control form-control-sm" id="title" name="title" th:value="${param.title}" placeholder="Введите название">
-                            </div>
+            <form method="get" action="#" th:action="@{/books/}" id="filterForm">
+                <!-- Первая строка: информация о книге -->
+                <div class="row g-2 mb-3">
+                    <div class="col-md-2">
+                        <label for="title" class="form-label">Название</label>
+                        <input type="text" class="form-control form-control-sm" id="title" name="title" th:value="${param.title}" placeholder="Введите название">
+                    </div>
 
-                            <div class="col-md-3">
-                                <label for="author" class="form-label">Автор</label>
-                                <input type="text" class="form-control form-control-sm" id="author" name="author" th:value="${param.author}" placeholder="Введите автора">
-                            </div>
+                    <div class="col-md-2">
+                        <label for="author" class="form-label">Автор</label>
+                        <input type="text" class="form-control form-control-sm" id="author" name="author" th:value="${param.author}" placeholder="Введите автора">
+                    </div>
 
-                            <div class="col-md-3">
-                                <label for="language" class="form-label">Язык</label>
-                                <input type="text" class="form-control form-control-sm" id="language" name="language" th:value="${param.language}" placeholder="Русский, Английский...">
-                            </div>
+                    <div class="col-md-2">
+                        <label for="language" class="form-label">Язык</label>
+                        <input type="text" class="form-control form-control-sm" id="language" name="language" th:value="${param.language}" placeholder="Русский, Английский...">
+                    </div>
 
-                            <div class="col-md-3">
-                                <label for="isbn" class="form-label">ISBN</label>
-                                <input type="text" class="form-control form-control-sm" id="isbn" name="isbn" th:value="${param.isbn}" placeholder="10 или 13 цифр">
-                            </div>
+                    <div class="col-md-2">
+                        <label for="isbn" class="form-label">ISBN</label>
+                        <input type="text" class="form-control form-control-sm" id="isbn" name="isbn" th:value="${param.isbn}" placeholder="10 или 13 цифр">
+                    </div>
+
+                    <div class="col-md-3 ms-auto">
+                        <label class="form-label">Сортировка</label>
+                        <div class="d-flex gap-2">
+                            <a th:href="@{/books(sort='title', dir=${dir == 'asc' ? 'desc' : 'asc'})}"
+                               class="btn btn-sm btn-outline-success w-50">
+                                Название
+                                <span th:if="${sort == 'title' and dir == 'asc'}">↑</span>
+                                <span th:if="${sort == 'title' and dir == 'desc'}">↓</span>
+                            </a>
+                            <a th:href="@{/books(sort='author', dir=${dir == 'asc' ? 'desc' : 'asc'})}"
+                               class="btn btn-sm btn-outline-success w-50">
+                                Автор
+                                <span th:if="${sort == 'author' and dir == 'asc'}">↑</span>
+                                <span th:if="${sort == 'author' and dir == 'desc'}">↓</span>
+                            </a>
                         </div>
+                    </div>
+                </div>
 
-                        <!-- Вторая строка: пользовательские отметки -->
-                        <div class="row g-2">
-                            <div class="col-md-4">
-                                <label class="form-label">Оценка</label>
-                                <div class="d-flex gap-2 align-items-center">
-                                    <select class="form-select form-select-sm" id="ratingFrom" name="ratingFrom">
-                                        <option value="">от</option>
-                                        <option th:each="r : ${#numbers.sequence(1, 5)}" th:value="${r}" th:text="${r}">1</option>
-                                    </select>
-                                    <span class="text-muted">—</span>
-                                    <select class="form-select form-select-sm" id="ratingTo" name="ratingTo">
-                                        <option value="">до</option>
-                                        <option th:each="r : ${#numbers.sequence(1, 5)}" th:value="${r}" th:text="${r}">5</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="col-md-4">
-                                <label for="status" class="form-label">Статус</label>
-                                <select class="form-select form-select-sm" id="status" name="status">
-                                    <option value="">Все</option>
-                                    <option th:each="st : ${statuses}" th:value="${st}" th:text="${st.value}">READING</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-4">
-                                <label for="source" class="form-label">Источник</label>
-                                <select class="form-select form-select-sm" id="source" name="source">
-                                    <option value="">Все</option>
-                                    <option th:each="src : ${sources}" th:value="${src}" th:text="${src.value}">EBOOK</option>
-                                </select>
-                            </div>
+                <!-- Вторая строка: пользовательские отметки + сброс -->
+                <div class="row g-2">
+                    <div class="col-md-3">
+                        <label class="form-label">Оценка</label>
+                        <div class="d-flex gap-2 align-items-center">
+                            <select class="form-select form-select-sm" id="ratingFrom" name="ratingFrom">
+                                <option value="">от</option>
+                                <option th:each="r : ${#numbers.sequence(1, 5)}" th:value="${r}" th:text="${r}">1</option>
+                            </select>
+                            <span class="text-muted">—</span>
+                            <select class="form-select form-select-sm" id="ratingTo" name="ratingTo">
+                                <option value="">до</option>
+                                <option th:each="r : ${#numbers.sequence(1, 5)}" th:value="${r}" th:text="${r}">5</option>
+                            </select>
                         </div>
                     </div>
 
-                    <!-- Правая колонка: кнопки (центрированы по вертикали) -->
-                    <div class="col-auto d-flex justify-content-end ms-auto">
-                        <div class="button-group-vertical">
-                            <button type="submit" class="btn btn-success btn-sm w-100 mb-2">Показать</button>
-                            <a th:href="@{/books/}" class="btn btn-outline-secondary btn-sm w-100">Сбросить</a>
-                        </div>
+                    <div class="col-md-2">
+                        <label for="status" class="form-label">Статус</label>
+                        <select class="form-select form-select-sm" id="status" name="status">
+                            <option value="">Все</option>
+                            <option th:each="st : ${statuses}" th:value="${st}" th:text="${st.value}"></option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label for="source" class="form-label">Источник</label>
+                        <select class="form-select form-select-sm" id="source" name="source">
+                            <option value="">Все</option>
+                            <option th:each="src : ${sources}" th:value="${src}" th:text="${src.value}"></option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3 ms-auto">
+                        <label class="form-label">&nbsp;</label>
+                        <a th:href="@{/books}" class="btn btn-sm btn-outline-secondary w-100">Сбросить</a>
                     </div>
                 </div>
             </form>
@@ -177,12 +187,12 @@
         </div>
     </div>
 
-    <div class="text-center mt-3">
+    <div class="text-center mt-3" th:if="${page.totalPages > 1}">
         <nav>
             <ul class="pagination justify-content-center">
                 <li th:class="${page.first} ? 'page-item disabled' : 'page-item'">
                     <a th:if="${!page.first}"
-                       th:href="@{/books/(page=${page.number - 1}, sort=${sort}, dir=${dir})}"
+                       th:href="@{/books(page=${page.number - 1}, sort=${sort}, dir=${dir})}"
                        class="page-link text-success">Назад</a>
                     <span th:if="${page.first}" class="page-link text-secondary">Назад</span>
                 </li>
@@ -195,7 +205,7 @@
 
                 <li th:class="${page.last} ? 'page-item disabled' : 'page-item'">
                     <a th:if="${!page.last}"
-                       th:href="@{/books/(page=${page.number + 1}, sort=${sort}, dir=${dir})}"
+                       th:href="@{/books(page=${page.number + 1}, sort=${sort}, dir=${dir})}"
                        class="page-link text-success">Далее</a>
                     <span th:if="${page.last}" class="page-link text-secondary">Далее</span>
                 </li>

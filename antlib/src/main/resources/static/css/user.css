@@ -1,0 +1,33 @@
+ body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .auth-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+        }
+        .btn-success-custom {
+            background-color: #28a745;
+            border: none;
+            padding: 10px;
+            font-weight: 500;
+        }
+        .btn-success-custom:hover {
+            background-color: #218838;
+        }
+        .switch-link {
+            cursor: pointer;
+            color: #28a745;
+            text-decoration: none;
+        }
+        .switch-link:hover {
+            text-decoration: underline;
+        }
+        .error-message {
+                    font-size: 0.875rem;
+                    margin-top: 5px;
+                }

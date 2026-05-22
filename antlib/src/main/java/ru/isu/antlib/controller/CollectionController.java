@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/collections")
 public class CollectionController {
-    @GetMapping("/")
+    @GetMapping
     public String collections(){
         return "collections/allCollections";
     }

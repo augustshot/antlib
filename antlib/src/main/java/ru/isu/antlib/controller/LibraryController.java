@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/library")
 public class LibraryController {
-    @GetMapping("/")
+    @GetMapping
     public String libraries(){
         return "library/allLibraries";
     }

@@ -3,6 +3,7 @@ package ru.isu.antlib.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.isu.antlib.model.User;
 import ru.isu.antlib.model.UserBookMark;
 import ru.isu.antlib.repository.BookDescriptionRepository;
@@ -17,6 +18,7 @@ public class UserBookMarkService {
     @Autowired
     private UserBookMarkRepository userBookMarkRepository;
 
+    @Transactional
     public UserBookMark save(UserBookMark userBookMark) {
         return userBookMarkRepository.save(userBookMark);
     }

@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
@@ -70,23 +72,29 @@ public class BookController {
     }
 
 
-    @GetMapping("/")
-    public String books(Model model, Pageable page, Sort sort){
-        Integer userId = 1;
+    @GetMapping
+    public String books(Model model,
+                        @RequestParam(required = false) String sort,
+                        @RequestParam(required = false) String dir,
+                        Pageable page, @AuthenticationPrincipal UserDetails auth) {
 
-        Pageable pageNew = PageRequest.of(page.getPageNumber(), 20, page.getSort());
+        Integer userId = userRepository.findByUsername(auth.getUsername()).get().getId();
 
-        Sort.Order order = null;
-        if (sort != null && sort.iterator().hasNext()) {
-            order = sort.iterator().next();
-        } else {
-            order = new Sort.Order(Sort.Direction.ASC, "bookDescription.title");
-            sort = Sort.by(order);
+        String sortField = "title";
+        Sort.Direction direction = Sort.Direction.ASC;
+
+        if (sort != null && !sort.isEmpty()) {
+            sortField = sort;
+            direction = (dir != null && dir.equalsIgnoreCase("desc")) ? Sort.Direction.DESC : Sort.Direction.ASC;
         }
 
-        model.addAttribute("sort", (order != null) ? order.getProperty() : "");
-        model.addAttribute("dir", (order != null) ? order.getDirection().toString() : "");
-        model.addAttribute("page", userBookMarkRepository.findAllBooks(userId, pageNew));
+        String fullSortField = "bookDescription." + sortField;
+        Sort sortObj = Sort.by(direction, fullSortField);
+        Pageable pageable = PageRequest.of(page.getPageNumber(), 20, sortObj);
+
+        model.addAttribute("sort", sortField);
+        model.addAttribute("dir", direction.toString().toLowerCase());
+        model.addAttribute("page", userBookMarkRepository.findAllBooks(userId, pageable));
 
         return "books/allBooks";
     }
@@ -131,7 +139,9 @@ public class BookController {
 
 
     @PostMapping("/saveMultiple")
-    public String saveMultiple(@RequestParam(value="multipleIsbn") String isbnListStr, Model model, RedirectAttributes redirectAttributes){
+    public String saveMultiple(@RequestParam(value="multipleIsbn") String isbnListStr,
+                               Model model, RedirectAttributes redirectAttributes,
+                               @AuthenticationPrincipal UserDetails auth){
         String[] isbnArray = isbnListStr.split("\\r?\\n");
         Set<String> isbnList = new HashSet<String>();
         for (String s : isbnArray) {
@@ -140,8 +150,8 @@ public class BookController {
                 isbnList.add(cleaned);
             }
         }
-//        !!!!!!!!!!!!!!!!!!
-        Optional<User> currentUser = userRepository.findById(1);
+
+        User currentUser = userRepository.findByUsername(auth.getUsername()).get();
 
         ArrayList<String> added = new ArrayList<>();
         ArrayList<String> skipped = new ArrayList<>();
@@ -150,7 +160,7 @@ public class BookController {
         // много книжек сохраняются сразу без вызова /save
         for(String s : isbnList){
             // уже есть у пользователя?
-            UserBookMark userBookMark = userBookMarkService.getByUserIdAndISBN(currentUser.get().getId(), s);
+            UserBookMark userBookMark = userBookMarkService.getByUserIdAndISBN(currentUser.getId(), s);
             if(userBookMark != null){
                 duplicates.add(s);
             }
@@ -160,7 +170,7 @@ public class BookController {
                 userBookMark = new UserBookMark();
                 if(book != null){
                     userBookMark.setBookDescription(book);
-                    userBookMark.setUser(currentUser.get());
+                    userBookMark.setUser(currentUser);
                     userBookMarkService.save(userBookMark);
                     added.add(s);
                 }else{
@@ -170,7 +180,7 @@ public class BookController {
                         book.setVerified(true);
                         bookDescriptionService.save(book);
                         userBookMark.setBookDescription(book);
-                        userBookMark.setUser(currentUser.get());
+                        userBookMark.setUser(currentUser);
                         userBookMarkService.save(userBookMark);
                         added.add(s);
                     }
@@ -189,31 +199,30 @@ public class BookController {
 
         redirectAttributes.addFlashAttribute("summaryMessage", summaryMessage);
 
-        return "redirect:/books/";
+        return "redirect:/books";
     }
 
     @PostMapping("/save")
     public String saveSingle(
             @Valid @ModelAttribute("userBook") UserBook userBook,
             BindingResult bindingResult,
-            Model model) {
+            Model model, @AuthenticationPrincipal UserDetails auth) {
 
         if (bindingResult.hasErrors())
             return "books/addBook";
 
-//        !!!!!!!!!!!!!!!
-        Optional<User> currentUser = userRepository.findById(1);
+        User currentUser = userRepository.findByUsername(auth.getUsername()).get();
         BookDescription book = userBook.getBookDescription();
 
         // проверяем, есть ли у юзера книга с таким исбн
-        UserBookMark userBookMark = userBookMarkService.getByUserIdAndISBN(currentUser.get().getId(), book.getISBN());
+        UserBookMark userBookMark = userBookMarkService.getByUserIdAndISBN(currentUser.getId(), book.getISBN());
         if(userBookMark != null){
             model.addAttribute("errorMessage", "В вашей библиотеке уже есть книга с таким ISBN");
             return "books/addBook";
         }
 
         UserBookMark mark = userBook.getUserBookMark();
-        mark.setUser(currentUser.get());
+        mark.setUser(currentUser);
 
         // проверяем, есть ли офиц книга с таким исбн в бд и если да то equals
         BookDescription verified =bookDescriptionService.findByISNBVerified(book.getISBN());
