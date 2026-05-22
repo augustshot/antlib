@@ -7,8 +7,9 @@
     <title>Мои книги</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
-    <link th:href="@{/css/books.css}" ref = "/css/books.css" rel="stylesheet"/>
-    <script th:src="@{/js/showMultipleIsbnResult.js}" src = "/js/showMultipleIsbnResult.js" type="text/javascript"></script>
+    <link th:href="@{/css/books.css}" rel="stylesheet"/>
+    <script th:src="@{/js/showMultipleIsbnResult.js}" type="text/javascript"></script>
+    <script th:src="@{/js/filter.js}" type="text/javascript"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
 </head>
@@ -17,7 +18,7 @@
 <div th:replace="~{header :: header}"></div>
 
 <div class="container mt-4">
-    <!-- Заголовок и кнопка в одной строке -->
+    <!-- Заголовок и кнопка -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="text-success mb-0">Мои книги</h2>
         <a th:href="@{/books/add}" class="btn btn-outline-success px-4 py-2">
@@ -35,39 +36,39 @@
             <h5 class="mb-0">Фильтры</h5>
         </div>
         <div class="card-body">
-            <form method="get" action="#" th:action="@{/books/}" id="filterForm">
-                <!-- Первая строка: информация о книге -->
+            <form method="get" th:action="@{/books}" th:object="${filter}" id="filterForm">
+                <!-- Первая строка -->
                 <div class="row g-2 mb-3">
                     <div class="col-md-2">
-                        <label for="title" class="form-label">Название</label>
-                        <input type="text" class="form-control form-control-sm" id="title" name="title" th:value="${param.title}" placeholder="Введите название">
+                        <label class="form-label">Название</label>
+                        <input type="text" class="form-control form-control-sm" th:field="*{title}" placeholder="Введите название">
                     </div>
 
                     <div class="col-md-2">
-                        <label for="author" class="form-label">Автор</label>
-                        <input type="text" class="form-control form-control-sm" id="author" name="author" th:value="${param.author}" placeholder="Введите автора">
+                        <label class="form-label">Автор</label>
+                        <input type="text" class="form-control form-control-sm" th:field="*{author}" placeholder="Введите автора">
                     </div>
 
                     <div class="col-md-2">
-                        <label for="language" class="form-label">Язык</label>
-                        <input type="text" class="form-control form-control-sm" id="language" name="language" th:value="${param.language}" placeholder="Русский, Английский...">
+                        <label class="form-label">Язык</label>
+                        <input type="text" class="form-control form-control-sm" th:field="*{language}" placeholder="Русский, Английский...">
                     </div>
 
                     <div class="col-md-2">
-                        <label for="isbn" class="form-label">ISBN</label>
-                        <input type="text" class="form-control form-control-sm" id="isbn" name="isbn" th:value="${param.isbn}" placeholder="10 или 13 цифр">
+                        <label class="form-label">ISBN</label>
+                        <input type="text" class="form-control form-control-sm" th:field="*{isbn}" placeholder="10 или 13 цифр">
                     </div>
 
                     <div class="col-md-3 ms-auto">
                         <label class="form-label">Сортировка</label>
                         <div class="d-flex gap-2">
-                            <a th:href="@{/books(sort='title', dir=${dir == 'asc' ? 'desc' : 'asc'})}"
+                            <a th:href="@{/books(sort='title', dir=${dir == 'asc' ? 'desc' : 'asc'}, title=${filter.title}, author=${filter.author}, language=${filter.language}, isbn=${filter.isbn}, ratingFrom=${filter.ratingFrom}, ratingTo=${filter.ratingTo}, status=${filter.status}, source=${filter.source})}"
                                class="btn btn-sm btn-outline-success w-50">
                                 Название
                                 <span th:if="${sort == 'title' and dir == 'asc'}">↑</span>
                                 <span th:if="${sort == 'title' and dir == 'desc'}">↓</span>
                             </a>
-                            <a th:href="@{/books(sort='author', dir=${dir == 'asc' ? 'desc' : 'asc'})}"
+                            <a th:href="@{/books(sort='author', dir=${dir == 'asc' ? 'desc' : 'asc'}, title=${filter.title}, author=${filter.author}, language=${filter.language}, isbn=${filter.isbn}, ratingFrom=${filter.ratingFrom}, ratingTo=${filter.ratingTo}, status=${filter.status}, source=${filter.source})}"
                                class="btn btn-sm btn-outline-success w-50">
                                 Автор
                                 <span th:if="${sort == 'author' and dir == 'asc'}">↑</span>
@@ -77,17 +78,17 @@
                     </div>
                 </div>
 
-                <!-- Вторая строка: пользовательские отметки + сброс -->
+                <!-- Вторая строка -->
                 <div class="row g-2">
                     <div class="col-md-3">
                         <label class="form-label">Оценка</label>
                         <div class="d-flex gap-2 align-items-center">
-                            <select class="form-select form-select-sm" id="ratingFrom" name="ratingFrom">
+                            <select class="form-select form-select-sm" th:field="*{ratingFrom}">
                                 <option value="">от</option>
                                 <option th:each="r : ${#numbers.sequence(1, 5)}" th:value="${r}" th:text="${r}">1</option>
                             </select>
                             <span class="text-muted">—</span>
-                            <select class="form-select form-select-sm" id="ratingTo" name="ratingTo">
+                            <select class="form-select form-select-sm" th:field="*{ratingTo}">
                                 <option value="">до</option>
                                 <option th:each="r : ${#numbers.sequence(1, 5)}" th:value="${r}" th:text="${r}">5</option>
                             </select>
@@ -95,16 +96,16 @@
                     </div>
 
                     <div class="col-md-2">
-                        <label for="status" class="form-label">Статус</label>
-                        <select class="form-select form-select-sm" id="status" name="status">
+                        <label class="form-label">Статус</label>
+                        <select class="form-select form-select-sm" th:field="*{status}">
                             <option value="">Все</option>
                             <option th:each="st : ${statuses}" th:value="${st}" th:text="${st.value}"></option>
                         </select>
                     </div>
 
                     <div class="col-md-3">
-                        <label for="source" class="form-label">Источник</label>
-                        <select class="form-select form-select-sm" id="source" name="source">
+                        <label class="form-label">Источник</label>
+                        <select class="form-select form-select-sm" th:field="*{source}">
                             <option value="">Все</option>
                             <option th:each="src : ${sources}" th:value="${src}" th:text="${src.value}"></option>
                         </select>
@@ -115,32 +116,37 @@
                         <a th:href="@{/books}" class="btn btn-sm btn-outline-secondary w-100">Сбросить</a>
                     </div>
                 </div>
+
+                <!-- Скрытые поля для сортировки -->
+                <input type="hidden" name="sort" th:value="${sort}"/>
+                <input type="hidden" name="dir" th:value="${dir}"/>
             </form>
         </div>
     </div>
 
-    <!-- Сетка карточек: 6 карточек в строке -->
+    <!-- Сетка карточек -->
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
         <div th:each="userBookMark : ${page.content}" class="col">
             <div class="card book-card">
                 <!-- Обложка -->
-                <th:block th:if="${userBookMark.bookDescription.cover != null}">
-                    <img th:src="${userBookMark.bookDescription.cover}"
-                         class="card-img-top book-cover"
-                         alt="Обложка книги"
-                         onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div class="book-cover-placeholder" style="display: none;">
-                        📖
-                    </div>
-                </th:block>
-                <th:block th:unless="${userBookMark.bookDescription.cover != null}">
-                    <div class="book-cover-placeholder">
-                        📖
-                    </div>
-                </th:block>
+                <div class="cover-wrapper">
+                    <th:block th:if="${userBookMark.bookDescription.cover != null}">
+                        <img th:src="${userBookMark.bookDescription.cover}"
+                             class="book-cover"
+                             alt="Обложка книги"
+                             onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="book-cover-placeholder" style="display: none;">
+                            📖
+                        </div>
+                    </th:block>
+                    <th:block th:unless="${userBookMark.bookDescription.cover != null}">
+                        <div class="book-cover-placeholder">
+                            📖
+                        </div>
+                    </th:block>
+                </div>
 
                 <div class="card-body">
-                    <!-- Название -->
                     <div class="book-title">
                         <a th:href="@{/books/book/{id}(id=${userBookMark.id})}"
                            th:text="${userBookMark.bookDescription.title}">
@@ -148,38 +154,25 @@
                         </a>
                     </div>
 
-                    <!-- Автор -->
                     <div class="book-author">
-                        <a
-                           th:text="${userBookMark.bookDescription.author}">
-                            Автор
-                        </a>
+                        <span th:text="${userBookMark.bookDescription.author}">Автор</span>
                     </div>
 
-                    <!-- Статус -->
                     <div class="book-detail">
                         <span class="book-detail-label">Статус:</span>
-                        <span th:if="${userBookMark.status != null}" class="book-status">
-                            <span th:text="${userBookMark.status.value}"></span>
-                        </span>
+                        <span th:if="${userBookMark.status != null}" th:text="${userBookMark.status.value}">—</span>
                         <span th:unless="${userBookMark.status != null}">—</span>
                     </div>
 
-                    <!-- Оценка (звёздами или числом) -->
                     <div class="book-detail">
                         <span class="book-detail-label">Оценка:</span>
-                        <span th:if="${userBookMark.rating != null}" class="book-rating">
-                            <span class="text-muted ms-1"><span th:text="${userBookMark.rating}"></span> из 5</span>
-                        </span>
+                        <span th:if="${userBookMark.rating != null}" th:text="${userBookMark.rating + ' из 5'}">—</span>
                         <span th:unless="${userBookMark.rating != null}">—</span>
                     </div>
 
-                    <!-- Источник -->
                     <div class="book-detail">
                         <span class="book-detail-label">Источник:</span>
-                        <span th:if="${userBookMark.source != null}" class="book-source">
-                            <span th:text="${userBookMark.source.value}"></span>
-                        </span>
+                        <span th:if="${userBookMark.source != null}" th:text="${userBookMark.source.value}">—</span>
                         <span th:unless="${userBookMark.source != null}">—</span>
                     </div>
                 </div>
@@ -187,25 +180,26 @@
         </div>
     </div>
 
+    <!-- Пагинация -->
     <div class="text-center mt-3" th:if="${page.totalPages > 1}">
         <nav>
             <ul class="pagination justify-content-center">
                 <li th:class="${page.first} ? 'page-item disabled' : 'page-item'">
                     <a th:if="${!page.first}"
-                       th:href="@{/books(page=${page.number - 1}, sort=${sort}, dir=${dir})}"
+                       th:href="@{/books(page=${page.number - 1}, sort=${sort}, dir=${dir}, title=${filter.title}, author=${filter.author}, language=${filter.language}, isbn=${filter.isbn}, ratingFrom=${filter.ratingFrom}, ratingTo=${filter.ratingTo}, status=${filter.status}, source=${filter.source})}"
                        class="page-link text-success">Назад</a>
                     <span th:if="${page.first}" class="page-link text-secondary">Назад</span>
                 </li>
 
                 <li class="page-item disabled">
-                <span class="page-link">
-                    <span th:text="${page.number + 1}"></span> / <span th:text="${page.totalPages}"></span>
-                </span>
+                    <span class="page-link">
+                        <span th:text="${page.number + 1}"></span> / <span th:text="${page.totalPages}"></span>
+                    </span>
                 </li>
 
                 <li th:class="${page.last} ? 'page-item disabled' : 'page-item'">
                     <a th:if="${!page.last}"
-                       th:href="@{/books(page=${page.number + 1}, sort=${sort}, dir=${dir})}"
+                       th:href="@{/books(page=${page.number + 1}, sort=${sort}, dir=${dir}, title=${filter.title}, author=${filter.author}, language=${filter.language}, isbn=${filter.isbn}, ratingFrom=${filter.ratingFrom}, ratingTo=${filter.ratingTo}, status=${filter.status}, source=${filter.source})}"
                        class="page-link text-success">Далее</a>
                     <span th:if="${page.last}" class="page-link text-secondary">Далее</span>
                 </li>
@@ -214,8 +208,10 @@
     </div>
 </div>
 
+
 <input type="hidden" id="showResultFlag" th:value="${showModal}" />
-<!-- Модальное окно для отображения результатов добавления нескольких книг -->
+
+<!-- Модальное окно для результатов добавления нескольких книг -->
 <div class="modal fade" id="resultModal" tabindex="-1" aria-labelledby="resultModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">

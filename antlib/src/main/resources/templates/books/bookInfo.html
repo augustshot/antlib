@@ -18,13 +18,19 @@
         <!-- Левая колонка: обложка и отметки -->
         <div class="col-lg-4 mb-4">
             <!-- Обложка -->
-            <div class="card mb-4">
-                <div th:if="${userBookMark.bookDescription.cover != null and userBookMark.bookDescription.cover != ''}">
-                    <img th:src="${userBookMark.bookDescription.cover}" alt="Обложка" class="book-cover" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div class="book-cover-placeholder" style="display: none;">📖</div>
-                </div>
-                <div th:unless="${userBookMark.bookDescription.cover != null and userBookMark.bookDescription.cover != ''}" class="book-cover-placeholder">
-                    📖
+            <div class="card mb-4 p-2"> <!-- Добавил p-2 для небольшого отступа внутри карточки -->
+                <div class="cover-container">
+                    <th:block th:if="${userBookMark.bookDescription.cover != null and userBookMark.bookDescription.cover != ''}">
+                        <img th:src="${userBookMark.bookDescription.cover}"
+                             alt="Обложка"
+                             class="book-cover"
+                             onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="book-cover-placeholder" style="display: none;">📖</div>
+                    </th:block>
+
+                    <th:block th:unless="${userBookMark.bookDescription.cover != null and userBookMark.bookDescription.cover != ''}">
+                        <div class="book-cover-placeholder">📖</div>
+                    </th:block>
                 </div>
             </div>
 

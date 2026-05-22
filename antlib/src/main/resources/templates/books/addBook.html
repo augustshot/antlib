@@ -114,6 +114,9 @@
                                 Формат ISBN: 10- или 13-значный номер<br>
                                 <strong>Внимание:</strong> все найденные книги будут добавлены без предварительного просмотра
                             </div>
+                            <div class="form-text mt-2">
+                                <strong>Внимание:</strong> все найденные книги будут добавлены без предварительного просмотра
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -156,7 +159,7 @@
                     <span th:if="${#fields.hasErrors('bookDescription.year')}" th:errors="*{bookDescription.year}" class="text-danger error-text"></span>
                 </div>
                 <div class="col-md-2">
-                    <label for="pages" class="form-label required-field">Страниц</label>
+                    <label for="pages" class="form-label">Страниц</label>
                     <input type="number" class="form-control" id="pages" th:field="*{bookDescription.pages}" placeholder="300">
                     <span th:if="${#fields.hasErrors('bookDescription.pages')}" th:errors="*{bookDescription.pages}" class="text-danger error-text"></span>
                 </div>

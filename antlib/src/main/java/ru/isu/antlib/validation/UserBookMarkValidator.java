@@ -2,7 +2,7 @@ package ru.isu.antlib.validation;
 
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
-import ru.isu.antlib.model.UserBook;
+import ru.isu.antlib.dto.UserBookDto;
 import ru.isu.antlib.model.UserBookMark;
 
 import java.time.LocalDate;
@@ -10,13 +10,13 @@ import java.time.LocalDate;
 public class UserBookMarkValidator implements Validator {
     @Override
     public boolean supports(Class<?> type) {
-        return UserBook.class.equals(type);
+        return UserBookDto.class.equals(type);
     }
 
     @Override
     public void validate(Object o, Errors e) {
 //        ValidationUtils.rejectIfEmpty(e,"number", "error.number.empty", "Введите номер рейса");
-        UserBook userBook = (UserBook) o;
+        UserBookDto userBook = (UserBookDto) o;
         UserBookMark userBookMark = userBook.getUserBookMark();
         LocalDate start = userBookMark.getDateStart();
         LocalDate finish = userBookMark.getDateFinish();
