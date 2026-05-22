@@ -5,9 +5,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Изменить книгу</title>
+    <title>Редактировать книгу</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/books.css}">
+    <script th:src="@{/js/searchISBN.js}" src = "/js/searchISBN.js" type="text/javascript"></script>
+    <script th:src="@{/js/searchMultipleISBN.js}" src = "/js/searchMultipleISBN.js" type="text/javascript"></script>
+    <script th:src="@{/js/cancelConfirmation.js}" src = "/js/cancelConfirmation.js" type="text/javascript"></script>
 </head>
 <body>
 
@@ -15,11 +18,17 @@
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-success mb-0">Изменить книгу</h2>
+        <h2 class="text-success mb-0">Редактировать книгу</h2>
+
+
+    </div>
+    <div id="errorMessage" th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 
     <!-- Одна форма с th:object UserBook -->
-    <form th:action="@{/books/update}" th:object="${userBook}" th:method="post">
+    <form th:action="@{/books/book/edit/{id}(id=${userBook.userBookMark.id})}"  th:object="${userBook}" th:method="post">
 
         <!-- Секция: Основная информация (BookDescription) -->
         <div class="form-section">
@@ -40,6 +49,7 @@
                 <div class="col-md-3">
                     <label for="ISBN" class="form-label">ISBN</label>
                     <input type="text" class="form-control" id="ISBN" th:field="*{bookDescription.ISBN}" placeholder="10- или 13-значный номер">
+                    <span th:if="${#fields.hasErrors('bookDescription.ISBN')}" th:errors="*{bookDescription.ISBN}" class="text-danger error-text"></span>
                 </div>
                 <div class="col-md-2">
                     <label for="year" class="form-label">Год издания</label>
@@ -47,7 +57,7 @@
                     <span th:if="${#fields.hasErrors('bookDescription.year')}" th:errors="*{bookDescription.year}" class="text-danger error-text"></span>
                 </div>
                 <div class="col-md-2">
-                    <label for="pages" class="form-label required-field">Страниц</label>
+                    <label for="pages" class="form-label">Страниц</label>
                     <input type="number" class="form-control" id="pages" th:field="*{bookDescription.pages}" placeholder="300">
                     <span th:if="${#fields.hasErrors('bookDescription.pages')}" th:errors="*{bookDescription.pages}" class="text-danger error-text"></span>
                 </div>
@@ -63,7 +73,7 @@
             <div class="row g-3 mt-2">
                 <div class="col-12">
                     <label for="cover" class="form-label">Обложка (URL)</label>
-                    <input type="url" class="form-control" id="cover" th:field="*{bookDescription.cover}" placeholder="https://...">
+                    <input class="form-control" id="cover" th:field="*{bookDescription.cover}" placeholder="https://...">
                 </div>
             </div>
             <div class="row g-3 mt-2">
@@ -119,7 +129,7 @@
             </div>
             <div class="row g-3 mt-2">
                 <div class="col-12">
-                    <label for="review" class="form-label">Рецензия / Заметки</label>
+                    <label for="review" class="form-label">Мои заметки</label>
                     <textarea class="form-control" id="review" th:field="*{userBookMark.review}" rows="3" placeholder="Ваши впечатления о книге..."></textarea>
                 </div>
             </div>
@@ -127,10 +137,32 @@
 
         <!-- Кнопки -->
         <div class="d-flex justify-content-end gap-3 mt-4 mb-5">
-            <a th:href="@{/books/${userBookMark.id}}" class="btn btn-secondary px-4">Отмена</a>
-            <button type="submit" class="btn btn-success px-4">Сохранить</button>
+            <a th:href="@{/books}" class="btn btn-outline-secondary px-4" id="cancelBtn">Отмена</a>
+            <button type="submit" class="btn btn-success px-4">Сохранить изменения</button>
         </div>
     </form>
+</div>
+
+<!-- Модальное окно подтверждения выхода -->
+<div class="modal fade" id="confirmExitModal" tabindex="-1" aria-labelledby="confirmExitModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeleteModalLabel">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>Подтверждение отмены
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+
+                <p>Вы уверены, что хотите выйти без сохранения?</p>
+                <p class="text-muted small">Все введенные данные будут потеряны.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="confirmExitBtn">Выйти</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

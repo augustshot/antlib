@@ -57,3 +57,15 @@
     background-color: #f8f9fa;
     overflow: hidden;
 }
+
+ .status-btn {
+        transition: all 0.2s ease;
+    }
+    .rating-star {
+        cursor: pointer;
+        transition: transform 0.1s ease;
+        color: #ffc107;
+    }
+    .rating-star:hover {
+        transform: scale(1.1);
+    }

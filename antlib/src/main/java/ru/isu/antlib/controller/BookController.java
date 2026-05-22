@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -142,30 +143,41 @@ public class BookController {
         return "books/addBook";
     }
 
+    
     @GetMapping("searchISBN")
     public String searchByIsbn(@RequestParam(value="isbn") String isbn, Model model) {
         
 
         // есть в бд?
-        BookDescription book = bookDescriptionService.findByISNBVerified(isbn);
+        BookDescription book = bookDescriptionService.findByISBNVerified(isbn);
         if(book != null){
-            UserBookDto userBook = new UserBookDto();
-            userBook.setBookDescription(book);
-            model.addAttribute("userBook", userBook);
-            return "books/addBook";
-        }
-
-        // Поиск книги
-        try {
-            book = BookParser.findByISBN(isbn); // официальная книга
-
-            if (book != null) {
-                book.setVerified(true);
-                bookDescriptionService.save(book);
                 UserBookDto userBook = new UserBookDto();
                 userBook.setBookDescription(book);
                 model.addAttribute("userBook", userBook);
+                return "books/addBook";
+        }
+
+        try {
+            BookDescription officialBook = BookParser.findByISBN(isbn); // официальная книга
+//          есть идентичная неофициальная?
+            Optional<BookDescription> unverified = bookDescriptionService.findEqualByISBN(isbn, officialBook);
+            if(unverified.isPresent()){
+                // делаем ее официальной
+                book = unverified.get();
+                book.setVerified(true);
+                UserBookDto userBook = new UserBookDto();
+                userBook.setBookDescription(book);
+                model.addAttribute("userBook", userBook);
+                return "books/addBook";
             }
+
+            // еще не было в бд => добавляем
+            officialBook.setVerified(true);
+            bookDescriptionService.save(officialBook);
+            UserBookDto userBook = new UserBookDto();
+            userBook.setBookDescription(officialBook);
+            model.addAttribute("userBook", userBook);
+
 
         } catch (BookNotFoundException e) {
             // Книга не найдена по ISBN
@@ -185,7 +197,7 @@ public class BookController {
         return "books/addBook";
     }
 
-
+    
     @PostMapping("/saveMultiple")
     public String saveMultiple(@RequestParam(value="multipleIsbn") String isbnListStr,
                                Model model, RedirectAttributes redirectAttributes,
@@ -214,7 +226,7 @@ public class BookController {
             }
             else{
                 // есть в бд?
-                BookDescription book = bookDescriptionService.findByISNBVerified(s);
+                BookDescription book = bookDescriptionService.findByISBNVerified(s);
                 userBookMark = new UserBookMark();
                 if(book != null){
                     userBookMark.setBookDescription(book);
@@ -250,6 +262,7 @@ public class BookController {
         return "redirect:/books";
     }
 
+    
     @PostMapping("/save")
     public String saveSingle(
             @Valid @ModelAttribute("userBook") UserBookDto userBook,
@@ -274,9 +287,9 @@ public class BookController {
         mark.setUser(currentUser);
 
         // проверяем, есть ли офиц книга с таким исбн в бд и если да то equals
-        BookDescription verified =bookDescriptionService.findByISNBVerified(book.getISBN());
-        if(verified != null && verified.equals(book)){
-            mark.setBookDescription(verified);
+        BookDescription verifiedBook =bookDescriptionService.findByISBNVerified(book.getISBN());
+        if(verifiedBook != null && verifiedBook.equals(book)){
+            mark.setBookDescription(verifiedBook);
         }
         else{
             book.setVerified(false);
@@ -289,11 +302,147 @@ public class BookController {
         return "redirect:/books/book/" + mark.getId();
     }
 
+
+    @PostMapping("/saveFromSearch")
+    public ResponseEntity<?> saveBookFromSearch(@RequestBody Map<String, Object> bookData,
+                                                @AuthenticationPrincipal UserDetails auth) {
+        try {
+            String title = (String) bookData.get("title");
+            String author = (String) bookData.get("author");
+            String isbn = (String) bookData.get("isbn");
+            String cover = (String) bookData.get("cover");
+            Integer year = bookData.get("year") != null ? Integer.parseInt(bookData.get("year").toString()) : null;
+            Boolean verified = bookData.get("verified") != null && (Boolean) bookData.get("verified");
+
+            // Проверяем, есть ли уже такая книга в БД
+            BookDescription existingBook = null;
+            if (isbn != null && !isbn.isEmpty()) {
+                existingBook = bookDescriptionService.findByISBNVerified(isbn.replace("-", ""));
+            }
+
+            BookDescription savedBook;
+            if (existingBook != null) {
+                savedBook = existingBook;
+            } else {
+                // Создаём новую книгу
+                BookDescription newBook = new BookDescription();
+                newBook.setTitle(title);
+                newBook.setAuthor(author);
+                newBook.setISBN(isbn != null ? isbn.replace("-", "") : null);
+                newBook.setCover(cover);
+                newBook.setYear(year);
+                newBook.setVerified(verified);
+
+                savedBook = bookDescriptionService.save(newBook);
+            }
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("book", Map.of(
+                    "title", savedBook.getTitle(),
+                    "author", savedBook.getAuthor(),
+                    "isbn", savedBook.getISBN(),
+                    "cover", savedBook.getCover(),
+                    "year", savedBook.getYear()
+            ));
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
     @GetMapping("/book/{id}")
     public String bookInfo(Model model, @PathVariable Integer id){
         UserBookMark userBookMark = userBookMarkService.getByUserBookMarkId(id);
         model.addAttribute("userBookMark", userBookMark);
         return "books/bookInfo";
+    }
+
+    @GetMapping("/book/edit/{id}")
+    public String editBookInfo(Model model, @PathVariable Integer id){
+        UserBookMark userBookMark = userBookMarkService.getByUserBookMarkId(id);
+        UserBookDto userBook = new UserBookDto();
+        userBook.setUserBookMark(userBookMark);
+        userBook.setBookDescription(userBookMark.getBookDescription());
+
+        model.addAttribute("userBook", userBook);
+        return "books/editBook";
+    }
+
+    
+    @PostMapping("/book/edit/{id}")
+    public String updateBookInfo(
+            @Valid @ModelAttribute("userBook") UserBookDto userBook,
+            @PathVariable Integer id,
+            BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors())
+            return "books/editBook";
+
+        UserBookMark editedUserBookMark = userBook.getUserBookMark();
+        BookDescription editedBook = userBook.getBookDescription();
+
+        UserBookMark existingUserBookMark = userBookMarkService.getByUserBookMarkId(id);
+        BookDescription existingBook = existingUserBookMark.getBookDescription();
+
+        editedBook.setISBN(editedBook.getISBN().replace("-", ""));
+
+        // проверяем какую книгу поменяли
+        Boolean isVerified = existingBook.getVerified();
+        String isbn = editedBook.getISBN();
+
+        BookDescription verifiedBook = bookDescriptionService.findByISBNVerified(isbn);
+        if(isVerified && verifiedBook != null && !verifiedBook.equals(editedBook)) {
+            // офиц и не equals - сохраняем как новую неофиц, меняем ссылку в ubm
+                editedBook.setVerified(false);
+                editedBook.setId(null);
+                BookDescription saved = bookDescriptionService.save(editedBook);
+                existingUserBookMark.setBookDescription(saved);
+
+        }
+        else if(!isVerified && verifiedBook != null && verifiedBook.equals(editedBook)){
+                // если есть verified с таким isbn и совпадают с текущей, то удаляем текущую из бд и ставим ссылку на verified
+                Integer bookId = existingBook.getId();
+                existingUserBookMark.setBookDescription(verifiedBook);
+                bookDescriptionService.deleteById(bookId);
+            }
+            // нет официальной или не совпадают - просто сохраняем
+        else{
+            existingBook.setTitle(editedBook.getTitle());
+            existingBook.setAuthor(editedBook.getAuthor());
+            existingBook.setISBN(editedBook.getISBN());
+            existingBook.setYear(editedBook.getYear());
+            existingBook.setPages(editedBook.getPages());
+            existingBook.setLanguage(editedBook.getLanguage());
+            existingBook.setPublisher(editedBook.getPublisher());
+            existingBook.setCover(editedBook.getCover());
+            existingBook.setDescription(editedBook.getDescription());
+
+            bookDescriptionService.save(existingBook);
+        }
+        existingUserBookMark.setStatus(editedUserBookMark.getStatus());
+        existingUserBookMark.setRating(editedUserBookMark.getRating());
+        existingUserBookMark.setSource(editedUserBookMark.getSource());
+        existingUserBookMark.setReview(editedUserBookMark.getReview());
+        existingUserBookMark.setDateStart(editedUserBookMark.getDateStart());
+        existingUserBookMark.setDateFinish(editedUserBookMark.getDateFinish());
+
+        userBookMarkService.save(existingUserBookMark);
+        return "redirect:/books/book/" + existingUserBookMark.getId();
+    }
+
+    
+    @PostMapping("/book/delete/{id}")
+    public String deleteBook(@PathVariable Integer id) {
+        UserBookMark userBook = userBookMarkService.getByUserBookMarkId(id);
+        userBookMarkService.deleteBook(userBook);
+        return "redirect:/books";
     }
 
     @InitBinder("userBook")

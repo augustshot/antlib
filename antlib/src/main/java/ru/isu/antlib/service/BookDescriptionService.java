@@ -6,6 +6,9 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.isu.antlib.model.BookDescription;
 import ru.isu.antlib.repository.BookDescriptionRepository;
 
+import java.util.List;
+import java.util.Optional;
+
 @Service
 public class BookDescriptionService {
     @Autowired
@@ -16,7 +19,20 @@ public class BookDescriptionService {
         return bookDescriptionRepository.save(bookDescription);
     }
 
-    public BookDescription findByISNBVerified(String isbn){
+    public BookDescription findByISBNVerified(String isbn){
         return bookDescriptionRepository.findByISBNAndVerifiedTrue(isbn);
     }
+
+    public Optional<BookDescription> findEqualByISBN(String isbn, BookDescription book){
+        List<BookDescription> books = bookDescriptionRepository.findAllByISBNAndVerifiedFalse(isbn);
+        return books.stream()
+                .filter(s -> s.equals(book))
+                .findFirst();
+    }
+
+    @Transactional
+    public void deleteById(Integer id){
+        bookDescriptionRepository.deleteById(id);
+    }
+
 }

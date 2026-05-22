@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.isu.antlib.dto.UserBookDto;
+import ru.isu.antlib.model.BookDescription;
 import ru.isu.antlib.model.User;
 import ru.isu.antlib.model.UserBookMark;
 import ru.isu.antlib.repository.BookDescriptionRepository;
@@ -18,6 +20,9 @@ public class UserBookMarkService {
     @Autowired
     private UserBookMarkRepository userBookMarkRepository;
 
+    @Autowired
+    private BookDescriptionService bookDescriptionService;
+
     @Transactional
     public UserBookMark save(UserBookMark userBookMark) {
         return userBookMarkRepository.save(userBookMark);
@@ -29,5 +34,12 @@ public class UserBookMarkService {
 
     public UserBookMark getByUserIdAndISBN(Integer userId, String isbn){
         return userBookMarkRepository.findBookByUserIdAndISBN(userId, isbn);
+    }
+
+    @Transactional
+    public void deleteBook(UserBookMark userBookMark){
+        BookDescription book = userBookMark.getBookDescription();
+        userBookMarkRepository.deleteById(userBookMark.getId());
+        if(!book.getVerified()) bookDescriptionService.deleteById(book.getId());
     }
 }
