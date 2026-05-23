@@ -46,11 +46,10 @@ public class UserBookMarkService {
 
     public long[] getStats(Integer userId){
         long[] stats = new long[4];
-        List<UserBookMark> books = userBookMarkRepository.findAllBooks(userId);
-        stats[0] = books.stream().filter(b -> b.getStatus().equals(Status.PLANNED)).count();
-        stats[1] = books.stream().filter(b -> b.getStatus().equals(Status.READING)).count();
-        stats[2] = books.stream().filter(b -> b.getStatus().equals(Status.FINISHED)).count();
-        stats[3] = books.stream().filter(b -> b.getStatus().equals(Status.POSTPONED)).count();
+        stats[0] = userBookMarkRepository.countByUserIdAndStatus(userId, Status.PLANNED);
+        stats[1] = userBookMarkRepository.countByUserIdAndStatus(userId, Status.READING);
+        stats[2] = userBookMarkRepository.countByUserIdAndStatus(userId, Status.FINISHED);
+        stats[3] = userBookMarkRepository.countByUserIdAndStatus(userId, Status.POSTPONED);
         return stats;
     }
 }

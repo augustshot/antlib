@@ -27,4 +27,6 @@ public interface UserBookMarkRepository extends JpaRepository<UserBookMark, Inte
     @Query("select ubm from UserBookMark ubm join fetch ubm.bookDescription where ubm.user.id = :userId and ubm.bookDescription.ISBN = :ISBN")
     UserBookMark findBookByUserIdAndISBN(@Param("userId") Integer userId, @Param("ISBN") String isbn);
 
+    long countByUserIdAndStatus(Integer userId, Status status);
+
 }
