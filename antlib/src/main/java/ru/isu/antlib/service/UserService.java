@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.isu.antlib.model.User;
@@ -16,10 +17,12 @@ import java.util.Map;
 public class UserService implements UserDetailsService{
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -35,8 +38,20 @@ public class UserService implements UserDetailsService{
     @Transactional
     public void save(User user){
         user.setRole("ROLE_USER");
-        user.setPassword("{noop}"+user.getPassword());
+//        user.setPassword("{noop}"+user.getPassword());
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         this.userRepository.save(user);
+    }
+
+    @Transactional
+    public void update(User user, String newPassword) {
+        user.setRole("ROLE_USER");
+        System.out.println("получили " + newPassword);
+        if (!newPassword.isBlank()) {
+            user.setPassword(passwordEncoder.encode(newPassword));
+        }
+        System.out.println("итого " + user.getPassword());
+        userRepository.save(user);
     }
 
     public Map<Integer, String> getAllUsers(){
@@ -58,4 +73,8 @@ public class UserService implements UserDetailsService{
         return user;
     }
 
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+    }
 }

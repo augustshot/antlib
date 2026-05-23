@@ -29,7 +29,7 @@
 
     <!-- Одна форма с th:object UserBook -->
     <form th:action="@{/books/book/edit/{id}(id=${userBook.userBookMark.id})}"  th:object="${userBook}" th:method="post">
-
+        <input type="hidden" th:field="*{userBookMark.id}" />
         <!-- Секция: Основная информация (BookDescription) -->
         <div class="form-section">
             <div class="form-section-title">Основная информация</div>
@@ -101,6 +101,7 @@
                 <div class="col-md-4">
                     <label for="source" class="form-label">Источник</label>
                     <select class="form-select" id="source" th:field="*{userBookMark.source}">
+                        <option value="">Не указан</option>
                         <option th:each="src : ${sources}"
                                 th:value="${src}"
                                 th:text="${src.value}">OWNED</option>
@@ -109,6 +110,7 @@
                 <div class="col-md-4">
                     <label for="status" class="form-label">Статус чтения</label>
                     <select class="form-select" id="status" th:field="*{userBookMark.status}">
+                        <option value="">Не указан</option>
                         <option th:each="st : ${statuses}"
                                 th:value="${st}"
                                 th:text="${st.value}">PLANNED</option>

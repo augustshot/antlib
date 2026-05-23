@@ -22,21 +22,9 @@ public interface UserBookMarkRepository extends JpaRepository<UserBookMark, Inte
     UserBookMark findBookByUserBookMarkId(Integer id);
 
     @Query("select ubm from UserBookMark ubm join fetch ubm.bookDescription where ubm.user.id = :userId")
-    Page<UserBookMark> findAllBooks(@Param("userId") Integer userId, Pageable pageable);
+    List<UserBookMark> findAllBooks(@Param("userId") Integer userId);
 
     @Query("select ubm from UserBookMark ubm join fetch ubm.bookDescription where ubm.user.id = :userId and ubm.bookDescription.ISBN = :ISBN")
     UserBookMark findBookByUserIdAndISBN(@Param("userId") Integer userId, @Param("ISBN") String isbn);
-
-
-    // фильтры - specification?
-    // title
-    // author
-    List<UserBookMark> findByUserIdAndSource(Integer userId, Source source);
-    List<UserBookMark> findByUserIdAndStatus(Integer userId, Status status);
-    List<UserBookMark> findByUserIdAndRatingBetween(Integer userId, Integer minRating, Integer maxRating);
-    List<UserBookMark> findByUserIdAndRating(Integer userId, Integer rating);
-    void deleteByUserId(Integer userId);
-
-
 
 }

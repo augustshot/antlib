@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ru"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Редактировать профиль</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
+    <link rel="stylesheet" th:href="@{/css/profile.css}">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/editProfileValidation.js}" type="text/javascript"></script>
+</head>
+<body>
+
+
+<div th:replace="~{header :: header}"></div>
+
+<div class="container mt-4 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <div class="profile-card">
+                <!-- Заголовок -->
+                <div class="profile-header">
+                    <h2 class="text-success mb-0">Редактировать профиль</h2>
+                </div>
+
+                <!-- Форма -->
+                <form id="profile-form" th:action="@{/profile/edit}" method="post">
+                    <!-- Секция: Основная информация -->
+                    <div class="form-section">
+
+                        <div class="mb-3">
+                            <label for="username" class="form-label fw-bold">Имя пользователя</label>
+                            <input type="text" class="form-control" id="username" name="username"
+                                   th:value="${user.username}" placeholder="Введите имя пользователя">
+                            <div id="username-error" class="text-danger small mt-1 d-none"></div>
+                            <div class="form-text">Имя пользователя должно быть уникальным</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label fw-bold">Email</label>
+                            <input type="email" class="form-control" id="email" name="email"
+                                   th:value="${user.email}" placeholder="example@email.com">
+                            <div id="email-error" class="text-danger small mt-1 d-none"></div>
+                        </div>
+                    </div>
+
+                    <!-- Секция: Смена пароля -->
+                    <div class="form-section">
+                        <h5 class="form-section-title">
+                            <i class="bi bi-key me-2"></i>Смена пароля
+                        </h5>
+
+                        <div class="mb-3">
+                            <label for="new-password" class="form-label fw-bold">Новый пароль</label>
+                            <input type="password" class="form-control" id="new-password" name="newPassword"
+                                   placeholder="Введите новый пароль">
+                            <div id="new-password-error" class="text-danger small mt-1 d-none"></div>
+                            <input type="hidden" id="password" name="password" th:field="*{user.password}" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="confirm-password" class="form-label fw-bold">Подтверждение пароля</label>
+                            <input type="password" class="form-control" id="confirm-password" name="confirmPassword"
+                                   placeholder="Повторите новый пароль">
+                            <div id="confirm-password-error" class="text-danger small mt-1 d-none"></div>
+                        </div>
+                    </div>
+
+                    <!-- Кнопки -->
+                    <div class="form-section">
+                        <div class="d-flex justify-content-between gap-3">
+                            <a th:href="@{/profile}" class="btn btn-outline-secondary px-4">
+                                <i class="bi bi-arrow-left me-1"></i>Отмена
+                            </a>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-outline-danger px-4" id="deleteProfileBtn">
+                                    <i class="bi bi-trash3 me-1"></i>Удалить профиль
+                                </button>
+                                <button type="button" id="submit-button" class="btn btn-success px-4">
+                                    <i class="bi bi-check-lg me-1"></i>Сохранить изменения
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно подтверждения удаления профиля -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeleteModalLabel">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>Подтверждение удаления
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <p>Вы уверены, что хотите удалить свой профиль?</p>
+                <p class="text-muted small mt-2">
+                    <i class="bi bi-info-circle me-1"></i>Это действие нельзя отменить. Все ваши данные будут потеряны.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+                <form th:action="@{/profile/delete}" method="post" id="deleteForm">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash3 me-1"></i>Удалить профиль
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+</body>
+</html>

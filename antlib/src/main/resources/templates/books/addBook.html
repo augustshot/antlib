@@ -134,9 +134,9 @@
     <div class="modal fade search-modal" id="searchModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl big">
             <div class="modal-content big">
-                <div class="modal-header bg-success text-white">
+                <div class="modal-header text-white">
                     <h5 class="modal-title" id="searchModalLabel">
-                        <i class="fas fa-search me-2"></i>Поиск книг в OpenLibrary
+                        <i class="fas fa-search me-2"></i>Поиск
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Закрыть"></button>
                 </div>
@@ -258,6 +258,7 @@
                 <div class="col-md-4">
                     <label for="source" class="form-label">Источник</label>
                     <select class="form-select" id="source" th:field="*{userBookMark.source}">
+                        <option value="">Не указан</option>
                         <option th:each="src : ${sources}"
                                 th:value="${src}"
                                 th:text="${src.value}">OWNED</option>
@@ -266,6 +267,7 @@
                 <div class="col-md-4">
                     <label for="status" class="form-label">Статус чтения</label>
                     <select class="form-select" id="status" th:field="*{userBookMark.status}">
+                        <option value="">Не указан</option>
                         <option th:each="st : ${statuses}"
                                 th:value="${st}"
                                 th:text="${st.value}">PLANNED</option>

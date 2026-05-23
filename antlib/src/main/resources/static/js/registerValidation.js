@@ -5,7 +5,8 @@ function init() {
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('reg-pass');
     const confirmInput = document.getElementById('confirm-pass');
-    const form = document.getElementById('register-form');    const usernameError = document.getElementById('username-error');
+    const form = document.getElementById('register-form');
+    const usernameError = document.getElementById('username-error');
     const emailError = document.getElementById('email-error');
     const passwordError = document.getElementById('password-error');
     const confirmError = document.getElementById('confirm-error');
@@ -60,6 +61,25 @@ function init() {
             setValid(confirmInput, false, confirmError, 'Пароли не совпадают');
             return false;
         }
+    }
+
+    function checkPasswordStrength() {
+        if (!passwordInput) return true;
+
+        const password = passwordInput.value;
+
+        if (!password.trim()) {
+            resetValidation(passwordInput, passwordError);
+            return false;
+        }
+
+        if (password.length < 8) {
+            setValid(passwordInput, false, passwordError, 'Пароль должен содержать минимум 8 символов');
+            return false;
+        }
+
+        setValid(passwordInput, true, passwordError, '');
+        return true;
     }
 
     // Динамическая проверка username
@@ -128,12 +148,9 @@ function init() {
             isValid = false;
         }
 
-        // Проверка пароля
-        if (!passwordInput || !passwordInput.value.trim()) {
-            setValid(passwordInput, false, passwordError, 'Введите пароль');
+        // Проверка пароля (длина)
+        if (!checkPasswordStrength()) {
             isValid = false;
-        } else {
-            setValid(passwordInput, true, passwordError, '');
         }
 
         // Проверка подтверждения пароля
@@ -143,7 +160,7 @@ function init() {
         } else if (passwordInput && confirmInput && passwordInput.value !== confirmInput.value) {
             setValid(confirmInput, false, confirmError, 'Пароли не совпадают');
             isValid = false;
-        } else {
+        } else if (passwordInput && passwordInput.value.length >= 8) {
             setValid(confirmInput, true, confirmError, '');
         }
 
@@ -165,9 +182,12 @@ function init() {
         passwordInput.addEventListener('input', function() {
             if (!passwordInput.value.trim()) {
                 setValid(passwordInput, false, passwordError, 'Введите пароль');
+            } else if (passwordInput.value.length < 8) {
+                setValid(passwordInput, false, passwordError, 'Пароль должен содержать минимум 8 символов');
             } else {
                 setValid(passwordInput, true, passwordError, '');
             }
+
             if (confirmInput.value.trim()) {
                 checkPasswords();
             }

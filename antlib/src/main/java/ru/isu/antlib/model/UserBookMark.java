@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.PastOrPresent;
 import lombok.*;
 import org.hibernate.validator.constraints.Range;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.util.Date;
@@ -35,9 +36,12 @@ public class UserBookMark {
     @Enumerated(EnumType.STRING)
     private Status status;
     @PastOrPresent(message="Дата не может быть в будущем")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Column(name="date_start")
     private LocalDate dateStart;
+
     @PastOrPresent(message="Дата не может быть в будущем")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Column(name="date_finish")
     private LocalDate dateFinish;
     private String review;
