@@ -27,7 +27,7 @@ public class SecurityConfig {
                         .requestMatchers("/login","/register","/swagger-ui/**","/v3/api-docs*/**", "/js/**", "/css/**", "/checkUsername").permitAll()
                         .requestMatchers("/books/**").hasAnyAuthority("ROLE_USER")
                         .requestMatchers("/collections/**").hasAnyAuthority("ROLE_USER")
-                        .requestMatchers("/library/**").hasAnyAuthority("ROLE_USER")
+                        .requestMatchers("/libraries/**").hasAnyAuthority("ROLE_USER")
                         .requestMatchers("/profile/**").hasAnyAuthority("ROLE_USER")
                         .anyRequest().authenticated()
                 )

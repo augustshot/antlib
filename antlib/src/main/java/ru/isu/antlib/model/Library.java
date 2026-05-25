@@ -16,6 +16,8 @@ public class Library {
     private Integer id;
     private String name;
 
+
     //@JsonIgnore
-    private String invite_code;
+    @Column(name="invite_code")
+    private String inviteCode;
 }

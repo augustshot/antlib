@@ -143,6 +143,30 @@ public class BookController {
         return "books/addBook";
     }
 
+    @GetMapping("/addFromLibrary")
+    public String addFromLibrary(@RequestParam Integer bookDescriptionId,
+                                 @RequestParam Integer libraryId,
+                                 Model model,
+                                 @AuthenticationPrincipal UserDetails auth) {
+
+        User user = userRepository.findByUsername(auth.getUsername()).get();
+
+        BookDescription bookDescription = bookDescriptionService.getById(bookDescriptionId).get();
+
+        UserBookDto userBook = new UserBookDto();
+        userBook.setBookDescription(bookDescription);
+
+        userBook.getUserBookMark().setSource(Source.SHARED);
+//        вместо libraryId создаем новую запись ubml
+//        userBook.getUserBookMark().setLibraryId(libraryId);
+
+        model.addAttribute("userBook", userBook);
+        model.addAttribute("source", Source.SHARED);
+//        model.addAttribute("libraryId", libraryId);
+
+        return "books/addBook";
+    }
+
     
     @GetMapping("searchISBN")
     public String searchByIsbn(@RequestParam(value="isbn") String isbn, Model model) {
@@ -191,7 +215,7 @@ public class BookController {
         } catch (Exception e) {
             model.addAttribute("errorMessage", "Произошла неизвестная ошибка: " + e.getMessage());
             model.addAttribute("userBook", new UserBookDto());
-            e.printStackTrace(); // Для отладки
+             // Для отладки
         }
 
         return "books/addBook";
@@ -200,6 +224,7 @@ public class BookController {
     
     @PostMapping("/saveMultiple")
     public String saveMultiple(@RequestParam(value="multipleIsbn") String isbnListStr,
+                               @RequestParam(value="multipleSource") String sourceStr,
                                Model model, RedirectAttributes redirectAttributes,
                                @AuthenticationPrincipal UserDetails auth){
         String[] isbnArray = isbnListStr.split("\\r?\\n");
@@ -210,6 +235,8 @@ public class BookController {
                 isbnList.add(cleaned);
             }
         }
+
+        Source source = sourceStr.isBlank() ? null : Source.valueOf(sourceStr);
 
         User currentUser = userRepository.findByUsername(auth.getUsername()).get();
 
@@ -229,6 +256,7 @@ public class BookController {
                 BookDescription book = bookDescriptionService.findByISBNVerified(s);
                 userBookMark = new UserBookMark();
                 if(book != null){
+                    if(source != null) userBookMark.setSource(source);
                     userBookMark.setBookDescription(book);
                     userBookMark.setUser(currentUser);
                     userBookMarkService.save(userBookMark);
@@ -239,6 +267,7 @@ public class BookController {
                     if (book != null) {
                         book.setVerified(true);
                         bookDescriptionService.save(book);
+                        if(source != null) userBookMark.setSource(source);
                         userBookMark.setBookDescription(book);
                         userBookMark.setUser(currentUser);
                         userBookMarkService.save(userBookMark);
@@ -349,7 +378,7 @@ public class BookController {
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            
             Map<String, Object> response = new HashMap<>();
             response.put("success", false);
             response.put("error", e.getMessage());

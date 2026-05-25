@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ru"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title th:text="${library.name}">Домашняя библиотека</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link th:href="@{/css/library.css}" rel="stylesheet"/>
+    <script th:src="@{/js/library.js}"></script>
+</head>
+<body>
+
+<div th:replace="~{header :: header}"></div>
+<input type="hidden" id="isOwner" th:value="${isOwner}">
+<input type="hidden" id="libraryId" th:value="${library.id}">
+<div class="container-fluid px-4 mt-4">
+    <!-- Верхний блок с информацией о библиотеке -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h2 class="text-success mb-1" th:text="${library.name}">Название библиотеки</h2>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="d-flex justify-content-md-end align-items-center gap-3 flex-wrap">
+                        <!-- Код библиотеки с копированием -->
+                        <div class="input-group w-auto">
+                            <span class="input-group-text bg-light">
+                                Код приглашения
+                            </span>
+                            <input type="text" class="form-control font-monospace"
+                                   id="libraryCode" th:value="${library.inviteCode}"
+                                   readonly style="width: 150px;">
+                            <button class="btn btn-outline-secondary" type="button" id="copyCodeBtn" title="Копировать код">
+                                <i class="bi bi-clipboard"></i>
+                            </button>
+                            <button th:if="${isOwner}" class="btn btn-outline-success" type="button" id="regenerateCodeBtn" title="Сгенерировать новый код">
+                                <i class="bi bi-arrow-repeat"></i>
+                            </button>
+                        </div>
+
+                        <!-- Кнопки действий -->
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-outline-success" id="membersBtn"
+                                    th:if="${isOwner}" data-bs-toggle="modal" data-bs-target="#membersModal">
+                                Участники
+                            </button>
+                            <button type="button" class="btn btn-outline-success" id="editLibraryBtn"
+                                    th:if="${isOwner}" data-bs-toggle="modal" data-bs-target="#editLibraryModal">
+                                Изменить
+                            </button>
+                            <button type="button" class="btn btn-outline-danger" id="deleteLibraryBtn"
+                                    th:if="${isOwner}" data-bs-toggle="modal" data-bs-target="#deleteLibraryModal">
+                                Удалить
+                            </button>
+                            <!-- Кнопка выхода для участника -->
+                            <button th:unless="${isOwner}" class="btn btn-outline-danger" id="leaveLibraryBtn" title="Выйти из библиотеки">
+                                <i class="bi bi-box-arrow-right me-1"></i>Выйти
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Три колонки -->
+    <div class="row">
+        <!-- Левая узкая колонка - Rooms -->
+        <div class="col-lg-2">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h6 class="mb-0">Комнаты</h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <div th:each="room : ${rooms}"
+                             class="list-group-item room-item d-flex justify-content-between align-items-center"
+                             th:data-room-id="${room.id}"
+                             th:data-room-name="${room.name}">
+                            <input type="hidden" class="room-id" th:value="${room.id}">
+                            <input type="hidden" class="room-name" th:value="${room.name}">
+                            <span th:text="${room.name}">Название комнаты</span>
+                            <div class="room-actions" th:if="${isOwner}">
+                                <button class="btn btn-sm btn-outline-success edit-room-btn" title="Изменить">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger delete-room-btn" title="Удалить">
+                                    <i class="bi bi-trash3"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white" th:if="${isOwner}">
+                        <button class="btn btn-sm btn-outline-success w-100" data-bs-toggle="modal" data-bs-target="#createRoomModal">
+                            <i class="bi bi-plus-circle me-1"></i>Создать комнату
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Центральная колонка - содержимое комнаты -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center" id="roomHeader">
+                    <div class="d-flex align-items-center gap-3">
+                        <h5 class="mb-0" id="roomNameHeader">Комната</h5>
+                        <!-- Кнопки режимов -->
+                        <div class="btn-group btn-group-sm" id="modeButtons">
+                            <button class="btn btn-success" id="viewModeBtn">Просмотр</button>
+                            <button class="btn btn-outline-success" id="editModeBtn">Редактирование</button>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 align-items-center">
+                        <!-- Зум -->
+                        <div class="btn-group btn-group-sm me-2">
+                            <button class="btn btn-outline-secondary" id="zoomOutBtn" title="Уменьшить">−</button>
+                            <span class="small text-muted align-self-center px-2" id="zoomLevel" style="min-width: 45px;">100%</span>
+                            <button class="btn btn-outline-secondary" id="zoomInBtn" title="Увеличить">+</button>
+                            <button class="btn btn-outline-secondary" id="resetViewBtn" title="Сброс">⟳</button>
+                        </div>
+
+                        <!-- Кнопка Сохранить (только в режиме редактирования) -->
+                        <button class="btn btn-sm btn-success d-none" id="saveLayoutBtn">
+                           Сохранить расстановку
+                        </button>
+
+                        <!-- Кнопка Добавить полку (только в режиме редактирования) -->
+                        <button class="btn btn-sm btn-outline-success d-none" id="openAddShelfModalBtn">
+                            <i class="bi bi-plus-lg me-1"></i>Добавить полку
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card-body p-0" style="height: 70vh; overflow: hidden; position: relative;">
+                    <div id="roomViewport" style="width: 100%; height: 100%; overflow: hidden; position: relative; cursor: grab;">
+                        <div id="roomCanvas" style="position: relative; transform-origin: 0 0; background-color: #f0f2f5;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Модальное окно добавления полки -->
+        <div class="modal fade" id="addShelfModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Добавить полку</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <label class="form-label">Ширина (клетки)</label>
+                        <input type="number" id="shelfWidth" class="form-control mb-2" min="1" max="10" value="2">
+                        <label class="form-label">Высота (клетки)</label>
+                        <input type="number" id="shelfHeight" class="form-control mb-2" min="1" max="10" value="2">
+                        <label class="form-label">Максимум книг на полке:</label>
+                        <span id="shelfCapacity" class="form-control bg-light">30</span>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+                        <button class="btn btn-success" id="confirmAddShelfBtn">Добавить</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="modal fade" id="resizeShelfModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Изменить размер полки</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <label class="form-label">Ширина (клетки)</label>
+                        <input type="number" id="resizeShelfWidth" class="form-control mb-2" min="1" max="10" step="1">
+                        <label class="form-label">Высота (клетки)</label>
+                        <input type="number" id="resizeShelfHeight" class="form-control mb-2" min="1" max="10" step="1">
+                        <label class="form-label">Максимум книг на полке:</label>
+                        <span id="resizeShelfCapacity" class="form-control bg-light"></span>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+                        <button class="btn btn-success" id="confirmResizeShelfBtn">Сохранить</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Модальное окно для удаления полки -->
+        <div class="modal fade" id="deleteShelfModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Удалить полку</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Вы уверены, что хотите удалить эту полку?</p>
+                        <p class="text-muted small">После сохранения изменений полка вместе с книками на ней будет удалена из библиотеки.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+                        <button type="button" class="btn btn-danger" id="confirmDeleteShelfBtn">Удалить</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Обновить модальное окно editShelfBooksModal -->
+        <div class="modal fade" id="editShelfBooksModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Книги на полке</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Добавьте этот блок для информации о полке -->
+                        <div id="shelfInfo" class="alert alert-light bg-light p-2 mb-3 rounded">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Книг на полке:</span>
+                                <span class="fw-bold" id="bookCount">0</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span>Свободно места:</span>
+                                <span class="fw-bold" id="availableSpace">0</span>
+                            </div>
+                        </div>
+
+                        <!-- Блок управления виден только владельцу -->
+                        <div id="ownerControlsBlock" class="d-none">
+                            <button class="btn btn-sm btn-danger w-100 mb-2" id="removeSelectedBooksBtn">Удалить выбранные</button>
+                            <div id="shelfBooksList" class="list-group mb-3"></div>
+                            <button class="btn btn-sm btn-outline-success w-100" id="openAddBooksToShelfBtn">+ Добавить книги</button>
+                        </div>
+
+                        <!-- Блок просмотра для остальных -->
+                        <div id="viewerBooksBlock">
+                            <div id="shelfBooksListViewer" class="list-group"></div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Модальное окно добавления книг на полку -->
+        <div class="modal fade" id="addBooksToShelfModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Добавить книги на полку</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="text" id="searchUserBooks" class="form-control mb-3" placeholder="Поиск по названию, автору, ISBN...">
+                        <div id="userBooksList" class="list-group" style="max-height: 400px; overflow-y: auto;">
+                            <!-- Список книг пользователя будет здесь -->
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+                        <button type="button" class="btn btn-success" id="confirmAddBooksBtn">Добавить выбранные</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Попап для просмотра книги -->
+        <div id="bookPopup" style="display: none; position: fixed; background: white; border: 1px solid #ccc; padding: 10px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 1000; width: 250px;">
+            <img id="popupCover" src="" style="width: 100%; height: auto; max-height: 150px; object-fit: contain;">
+            <div class="fw-bold mt-2" id="popupTitle"></div>
+            <div class="text-muted small" id="popupAuthor"></div>
+            <a href="#" id="popupLink" class="btn btn-sm btn-outline-success mt-2 w-100">Перейти к книге</a>
+        </div>
+
+
+        <!-- Правая узкая колонка - Поиск -->
+        <div class="col-lg-2">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h6 class="mb-0"><i class="bi bi-search me-1"></i>Поиск книг</h6>
+                </div>
+                <div class="card-body">
+                    <div class="input-group input-group-sm mb-3">
+                        <input type="text" class="form-control" id="searchBookInput"
+                               placeholder="Название, автор, ISBN...">
+                        <button class="btn btn-outline-success" type="button" id="searchBookBtn">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                    <div id="searchResults" class="small text-muted" style="display: none;">
+                        <div class="alert alert-info p-2 mb-2" id="searchResultsMessage"></div>
+                        <div id="foundBooksList" class="list-group" style="max-height: 300px; overflow-y: auto;"></div>
+                    </div>
+                    <hr>
+                    <button class="btn btn-sm btn-outline-secondary w-100" id="clearSearchBtn" style="display: none;">
+                        <i class="bi bi-x-circle me-1"></i>Очистить поиск
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+<!-- Модальное окно редактирования библиотеки -->
+<div class="modal fade" id="editLibraryModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Редактировать библиотеку</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editLibraryForm">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Название <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="editLibraryName" th:value="${library.name}">
+                        <div id="edit-name-error" class="text-danger small mt-1 d-none"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-success" id="saveLibraryBtn">Сохранить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно удаления библиотеки -->
+<div class="modal fade" id="deleteLibraryModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Удалить библиотеку</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Вы уверены, что хотите удалить библиотеку <strong th:text="${library.name}"></strong>?</p>
+                <p class="text-muted small">Это действие нельзя отменить. Книги сохранятся в вашем списке книг, но их расстановка будет потеряна.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Удалить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно участников библиотеки -->
+<div class="modal fade" id="membersModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header ">
+                <h5 class="modal-title">
+                    Участники библиотеки
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="list-group list-group-flush">
+                    <div th:each="member : ${members}" class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="bi bi-person-circle me-2 text-success"></i>
+                            <span th:text="${member.user.username}">Имя пользователя</span>
+                            <span th:if="${member.role.name() == 'OWNER'}" class="badge bg-success ms-2">Владелец</span>
+                            <span th:if="${member.role.name() != 'OWNER'}" class="badge bg-secondary ms-2">Участник</span>
+                        </div>
+                        <button th:if="${isOwner and member.role.name() != 'OWNER'}"
+                                class="btn btn-sm btn-outline-danger remove-member-btn"
+                                th:data-user-id="${member.user.id}"
+                                th:data-username="${member.user.username}">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                        <span th:if="${isOwner and member.role.name() == 'OWNER'}" class="text-muted small">
+                            <i class="bi bi-crown"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно подтверждения удаления участника -->
+<div class="modal fade" id="confirmRemoveMemberModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header ">
+                <h5 class="modal-title">
+                    Удаление участника
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Вы уверены, что хотите удалить участника <strong id="removeMemberName"></strong> из библиотеки?</p>
+                <p class="text-muted small">После удаления участник потеряет доступ ко всем книгам этой библиотеки.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-danger" id="confirmRemoveMemberBtn">Удалить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно создания комнаты -->
+<div class="modal fade" id="createRoomModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    Создать комнату
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createRoomForm">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Название комнаты <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="roomName" placeholder="Введите название комнаты">
+                        <div id="room-name-error" class="text-danger small mt-1 d-none"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-success" id="createRoomBtn">Создать</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно редактирования комнаты -->
+<div class="modal fade" id="editRoomModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Редактировать комнату</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editRoomId">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Название комнаты <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="editRoomName">
+                    <div id="edit-room-error" class="text-danger small mt-1 d-none"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-success" id="saveRoomBtn">Сохранить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно удаления комнаты -->
+<div class="modal fade" id="deleteRoomModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Удалить комнату</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="deleteRoomId">
+                <p>Вы уверены, что хотите удалить комнату <strong id="deleteRoomName"></strong>?</p>
+                <p class="text-muted small">Все полки и книги в комнате будут удалены.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteRoomBtn">Удалить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно подтверждения выхода из библиотеки -->
+<div class="modal fade" id="confirmLeaveModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Выйти из библиотеки</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Вы уверены, что хотите выйти из библиотеки <strong th:text="${library.name}"></strong>?</p>
+                <p class="text-muted small">Это действие нельзя отменить.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-danger" id="confirmLeaveBtn">Выйти</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

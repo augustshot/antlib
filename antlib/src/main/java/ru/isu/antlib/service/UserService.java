@@ -46,11 +46,9 @@ public class UserService implements UserDetailsService{
     @Transactional
     public void update(User user, String newPassword) {
         user.setRole("ROLE_USER");
-        System.out.println("получили " + newPassword);
         if (!newPassword.isBlank()) {
             user.setPassword(passwordEncoder.encode(newPassword));
         }
-        System.out.println("итого " + user.getPassword());
         userRepository.save(user);
     }
 

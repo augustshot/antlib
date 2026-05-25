@@ -85,3 +85,25 @@
     .btn-success-custom:hover {
         background: #218838;
     }
+
+    .profile-card {
+        margin-top: 1rem;
+    }
+
+    .form-section {
+        padding: 1.5rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .form-section:last-child {
+        border-bottom: none;
+    }
+
+    .profile-header {
+        padding: 1.5rem;
+    }
+
+    /* Дополнительный отступ для кнопок */
+    .form-section .d-flex {
+        margin-top: 0.5rem;
+    }

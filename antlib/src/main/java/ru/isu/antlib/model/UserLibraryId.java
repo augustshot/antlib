@@ -15,6 +15,7 @@ public class UserLibraryId implements java.io.Serializable {
     private Integer userId;
     private Integer libraryId;
 
+
     @Override
     public boolean equals(Object o)
     {

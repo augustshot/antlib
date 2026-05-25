@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ru"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Мои библиотеки</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link th:href="@{/css/library.css}" rel="stylesheet"/>
+    <script th:src="@{/js/addLibrary.js}" src="/js/addLibrary.js" type="text/javascript"></script>
+    <script th:src="@{/js/inviteCodeValidation.js}" type="text/javascript"></script>
+</head>
+<body>
+
+<div th:replace="~{header :: header}"></div>
+
+<div class="container mt-4">
+    <!-- Заголовок -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-success mb-0">Мои библиотеки</h2>
+        <button type="button" class="btn btn-outline-success px-4 py-2" data-bs-toggle="modal" data-bs-target="#createLibraryModal">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Создать библиотеку
+        </button>
+    </div>
+
+    <!-- Блок присоединения к библиотеке -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Присоединиться к библиотеке</h5>
+        </div>
+        <div class="card-body">
+            <form th:action="@{/libraries/join}" method="post" id="joinForm" class="row g-3 align-items-end">
+                <div class="col-md-8">
+                    <label for="inviteCode" class="form-label fw-bold">Код приглашения</label>
+                    <div class="input-group">
+                    <input type="text" class="form-control" id="inviteCode" name="inviteCode"
+                           placeholder="Введите код приглашения">
+
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <button type="button" id="invite-button" class="btn btn-success w-100" disabled>
+                        Присоединиться
+                    </button>
+                </div>
+                <div id="inviteCode-error" class="text-danger small mt-1 d-none"></div>
+                <div id="error-message" th:if="${errorMessage}" th:text="${errorMessage}" class="text-danger small mt-1"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Сетка карточек библиотек -->
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-3 row-cols-xl-4 g-4">
+        <div th:each="entry : ${userLibraries}" class="col">
+            <div th:with="userLibrary=${entry.key}, memberCount=${entry.value}" class="card library-card h-100">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title text-success mb-2" th:text="${userLibrary.library.name}">Название библиотеки</h5>
+                    <span class="badge mb-3 align-self-start"
+                          th:classappend="${userLibrary.role.value == 'Владелец' ? 'bg-success' : 'bg-secondary'}"
+                          th:text="${userLibrary.role.value}">Участник</span>
+                    <hr class="my-2">
+                    <div class="d-flex justify-content-between align-items-center mt-auto">
+                        <div class="small text-muted">
+                            Участников: <span th:text="${memberCount}">0</span>
+                        </div>
+                        <a th:href="@{/libraries/library/{id}(id=${userLibrary.library.id})}" class="btn btn-sm btn-outline-success">
+                            Перейти
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Если нет библиотек -->
+    <div th:unless="${userLibraries != null and !userLibraries.isEmpty()}" class="text-center py-5">
+        <i class="bi bi-collection fs-1 text-muted"></i>
+        <p class="text-muted mt-3 mb-0">У вас ещё нет библиотек</p>
+        <p class="text-muted small">Создайте новую библиотеку или присоединитесь к существующей по коду приглашения</p>
+    </div>
+
+</div>
+
+<!-- Модальное окно создания библиотеки -->
+<div class="modal fade" id="createLibraryModal" tabindex="-1" aria-labelledby="createLibraryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createLibraryModalLabel">
+                   Создать библиотеку
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createLibraryForm">
+                    <div class="mb-3">
+                        <label for="libraryName" class="form-label fw-bold">Название <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control required-field" id="libraryName" name="name"
+                               placeholder="Введите название библиотеки">
+                        <div id="name-error" class="text-danger small mt-1 d-none"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-success" id="createLibraryBtn">Создать</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -27,11 +27,11 @@
                              alt="Обложка"
                              class="book-cover"
                              onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <div class="book-cover-placeholder" style="display: none;">📖</div>
+                        <div class="book-cover-placeholder" style="display: none;">Нет обложки</div>
                     </th:block>
 
                     <th:block th:unless="${userBookMark.bookDescription.cover != null and userBookMark.bookDescription.cover != ''}">
-                        <div class="book-cover-placeholder">📖</div>
+                        <div class="book-cover-placeholder">Нет обложки</div>
                     </th:block>
                 </div>
             </div>

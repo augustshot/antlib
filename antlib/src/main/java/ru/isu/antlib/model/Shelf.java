@@ -19,9 +19,10 @@ public class Shelf {
     private Integer height;
 
     @Column(name="position_x")
-    private Float positionX;
+    private Integer positionX;
     @Column(name="position_y")
-    private Float positionY;
+    private Integer positionY;
+    private Integer capacity;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="room_id")

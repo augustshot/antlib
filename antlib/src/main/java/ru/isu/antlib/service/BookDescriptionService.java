@@ -35,4 +35,8 @@ public class BookDescriptionService {
         bookDescriptionRepository.deleteById(id);
     }
 
+    public Optional<BookDescription> getById(Integer id){
+        return bookDescriptionRepository.findById(id);
+    }
+
 }

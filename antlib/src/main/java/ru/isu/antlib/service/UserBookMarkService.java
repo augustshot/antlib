@@ -5,10 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.isu.antlib.dto.UserBookDto;
-import ru.isu.antlib.model.BookDescription;
-import ru.isu.antlib.model.Status;
-import ru.isu.antlib.model.User;
-import ru.isu.antlib.model.UserBookMark;
+import ru.isu.antlib.model.*;
 import ru.isu.antlib.repository.BookDescriptionRepository;
 import ru.isu.antlib.repository.UserBookMarkRepository;
 
@@ -37,11 +34,17 @@ public class UserBookMarkService {
         return userBookMarkRepository.findBookByUserIdAndISBN(userId, isbn);
     }
 
+    public UserBookMark getByUserAndBookDescription(User user, BookDescription bookDescription){
+        return userBookMarkRepository.findByUserIdAndBookDescriptionId(user.getId(), bookDescription.getId()).orElse(null);
+    }
+
     @Transactional
     public void deleteBook(UserBookMark userBookMark){
         BookDescription book = userBookMark.getBookDescription();
         userBookMarkRepository.deleteById(userBookMark.getId());
-        if(!book.getVerified()) bookDescriptionService.deleteById(book.getId());
+        if (!book.getVerified()) {
+                bookDescriptionService.deleteById(book.getId());
+            }
     }
 
     public long[] getStats(Integer userId){
@@ -51,5 +54,13 @@ public class UserBookMarkService {
         stats[2] = userBookMarkRepository.countByUserIdAndStatus(userId, Status.FINISHED);
         stats[3] = userBookMarkRepository.countByUserIdAndStatus(userId, Status.POSTPONED);
         return stats;
+    }
+
+    public List<UserBookMark> getByUserAndSourceAndSearch(User user, Source source, String search){
+        return userBookMarkRepository.findByUserIdAndSourceAndSearch(user.getId(), source, search);
+    }
+
+    public List<UserBookMark> getByUserAndSource(User user, Source source){
+        return userBookMarkRepository.findByUserIdAndSource(user.getId(), source);
     }
 }

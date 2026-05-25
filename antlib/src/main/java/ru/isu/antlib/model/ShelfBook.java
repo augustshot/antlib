@@ -21,6 +21,6 @@ public class ShelfBook {
     private Shelf shelf;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="book_instance_id")
-    private BookInstance bookInstance;
+    @JoinColumn(name="book_description_id")
+    private BookDescription bookDescription;
 }

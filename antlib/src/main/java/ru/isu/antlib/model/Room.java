@@ -19,4 +19,13 @@ public class Room {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="library_id")
     private Library library;
+
+    @Override
+    public String toString() {
+        return "Room{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", library=" + library +
+                '}';
+    }
 }

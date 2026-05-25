@@ -28,6 +28,23 @@ public class UserLibrary {
     private Library library;
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    public UserLibrary(User user, Library library, Role role) {
+        this.user = user;
+        this.library = library;
+        this.role = role;
+        this.id = new UserLibraryId(user.getId(), library.getId());
+    }
+
+    @Override
+    public String toString() {
+        return "UserLibrary{" +
+                "id=" + id +
+                ", user=" + user +
+                ", library=" + library +
+                ", role=" + role +
+                '}';
+    }
 }
 
 

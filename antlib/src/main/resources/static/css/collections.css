@@ -1,0 +1,46 @@
+/* collections.css - стили для страницы коллекций */
+
+body {
+    padding-bottom: 2rem;
+}
+
+/* Карточка коллекции */
+.collection-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.collection-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.collection-card .card-title {
+    font-weight: 600;
+}
+
+.collection-card .card-text {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 40px;
+}
+
+
+/* Кнопка добавления коллекции */
+.btn-outline-success {
+    transition: all 0.2s ease;
+}
+
+.btn-outline-success:hover {
+    transform: translateY(-2px);
+}
+
+/* Пустое состояние */
+.text-muted i {
+    opacity: 0.5;
+}
