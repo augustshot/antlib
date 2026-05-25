@@ -20,7 +20,7 @@ public class LibraryApiController {
     @Autowired
     private LibraryService libraryService;
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     @Autowired
     private UserBookMarkService userBookMarkService;
@@ -39,7 +39,7 @@ public class LibraryApiController {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            User currentUser = userRepository.findByUsername(auth.getUsername()).get();
+            User currentUser = userService.getByUsername(auth.getUsername());
 
             Library library = libraryService.getById(id);
             if (library == null) {
@@ -79,7 +79,7 @@ public class LibraryApiController {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            User user = userRepository.findByUsername(auth.getUsername()).get();
+            User user = userService.getByUsername(auth.getUsername());
 
             Library library = libraryService.getById(libraryId);
             boolean isOwner = userLibraryService.getOwner(library).equals(user);
@@ -110,7 +110,7 @@ public class LibraryApiController {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            User user = userRepository.findByUsername(auth.getUsername()).get();
+            User user = userService.getByUsername(auth.getUsername());
 
             String name = request.get("name");
 
@@ -145,7 +145,7 @@ public class LibraryApiController {
 
         Map<String, Object> response = new HashMap<>();
         try {
-            User user = userRepository.findByUsername(auth.getUsername()).get();
+            User user = userService.getByUsername(auth.getUsername());
 
             Library library = libraryService.getById(libraryId);
             if (library == null) {
@@ -180,7 +180,7 @@ public class LibraryApiController {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            User currentUser = userRepository.findByUsername(auth.getUsername()).get();
+            User currentUser = userService.getByUsername(auth.getUsername());
             String userIdStr = (String) request.get("userId");
             Integer userIdToRemove = userIdStr == null ? null : Integer.parseInt(userIdStr);
             String action = (String) request.get("action");
@@ -277,8 +277,7 @@ public class LibraryApiController {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            User user = userRepository.findByUsername(auth.getUsername())
-                    .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+            User user = userService.getByUsername(auth.getUsername());
 
             Library library = libraryService.getById(libraryId);
             if (library == null) {
@@ -357,7 +356,7 @@ public Map<String, Object> deleteRoom(@PathVariable Integer libraryId,
     Map<String, Object> response = new HashMap<>();
 
     try {
-        User user = userRepository.findByUsername(auth.getUsername()).get();
+        User user = userService.getByUsername(auth.getUsername());
 
         Library library = libraryService.getById(libraryId);
         boolean isOwner = userLibraryService.getOwner(library).equals(user);
@@ -389,7 +388,7 @@ public Map<String, Object> deleteRoom(@PathVariable Integer libraryId,
 
         try {
             // Проверяем доступ пользователя к библиотеке
-            User user = userRepository.findByUsername(auth.getUsername()).get();
+            User user = userService.getByUsername(auth.getUsername());
 
             Library library = libraryService.getById(libraryId);
             if (library == null) {
@@ -519,8 +518,7 @@ public Map<String, Object> deleteRoom(@PathVariable Integer libraryId,
 
         try {
             // Получаем текущего пользователя
-            User user = userRepository.findByUsername(auth.getUsername())
-                    .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+            User user = userService.getByUsername(auth.getUsername());
 
             // Проверяем доступ к библиотеке
             Library library = libraryService.getById(libraryId);
@@ -609,7 +607,7 @@ public Map<String, Object> deleteRoom(@PathVariable Integer libraryId,
         Map<String, Object> response = new HashMap<>();
 
         try {
-            User user = userRepository.findByUsername(auth.getUsername()).get();
+            User user = userService.getByUsername(auth.getUsername());
 
             // Проверяем доступ к библиотеке
             Library library = libraryService.getById(libraryId);
@@ -672,7 +670,7 @@ public Map<String, Object> deleteRoom(@PathVariable Integer libraryId,
         Map<String, Object> response = new HashMap<>();
 
         try {
-            User user = userRepository.findByUsername(auth.getUsername()).get();
+            User user = userService.getByUsername(auth.getUsername());
 
             // Проверка доступа к библиотеке
             Library library = libraryService.getById(libraryId);
@@ -751,7 +749,7 @@ public Map<String, Object> deleteRoom(@PathVariable Integer libraryId,
         Map<String, Object> response = new HashMap<>();
 
         try {
-            User user = userRepository.findByUsername(auth.getUsername()).get();
+            User user = userService.getByUsername(auth.getUsername());
 
             Library library = libraryService.getById(libraryId);
             if (library == null) {
@@ -793,7 +791,7 @@ public Map<String, Object> deleteRoom(@PathVariable Integer libraryId,
         Map<String, Object> response = new HashMap<>();
 
         try {
-            User user = userRepository.findByUsername(auth.getUsername()).get();
+            User user = userService.getByUsername(auth.getUsername());
 
             Library library = libraryService.getById(libraryId);
             boolean isOwner = userLibraryService.getOwner(library).equals(user);

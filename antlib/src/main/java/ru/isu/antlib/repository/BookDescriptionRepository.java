@@ -13,10 +13,7 @@ public interface BookDescriptionRepository extends JpaRepository<BookDescription
 
 //    ищем официальную книжку
     BookDescription findByISBNAndVerifiedTrue(String isbn);
-
-
     List<BookDescription> findAllByISBNAndVerifiedFalse(String isbn);
-    
-    void deleteByISBNAndVerifiedFalse(String isbn);
+
     
 }

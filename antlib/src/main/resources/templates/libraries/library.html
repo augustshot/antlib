@@ -306,7 +306,7 @@
                     </div>
                     <hr>
                     <button class="btn btn-sm btn-outline-secondary w-100" id="clearSearchBtn" style="display: none;">
-                        <i class="bi bi-x-circle me-1"></i>Очистить поиск
+                        Очистить поиск
                     </button>
                 </div>
             </div>
@@ -375,7 +375,7 @@
                 <div class="list-group list-group-flush">
                     <div th:each="member : ${members}" class="list-group-item d-flex justify-content-between align-items-center">
                         <div>
-                            <i class="bi bi-person-circle me-2 text-success"></i>
+
                             <span th:text="${member.user.username}">Имя пользователя</span>
                             <span th:if="${member.role.name() == 'OWNER'}" class="badge bg-success ms-2">Владелец</span>
                             <span th:if="${member.role.name() != 'OWNER'}" class="badge bg-secondary ms-2">Участник</span>
@@ -384,7 +384,7 @@
                                 class="btn btn-sm btn-outline-danger remove-member-btn"
                                 th:data-user-id="${member.user.id}"
                                 th:data-username="${member.user.username}">
-                            <i class="bi bi-x-lg"></i>
+
                         </button>
                         <span th:if="${isOwner and member.role.name() == 'OWNER'}" class="text-muted small">
                             <i class="bi bi-crown"></i>

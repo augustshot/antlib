@@ -82,7 +82,7 @@ public class BookController {
                         Pageable page, @AuthenticationPrincipal UserDetails auth,
                         @ModelAttribute("filter") FilterDto filter) {
 
-        Integer userId = userRepository.findByUsername(auth.getUsername()).get().getId();
+        Integer userId = userService.getByUsername(auth.getUsername()).getId();
 
         String sortField = "title";
         Sort.Direction direction = Sort.Direction.ASC;
@@ -149,7 +149,7 @@ public class BookController {
                                  Model model,
                                  @AuthenticationPrincipal UserDetails auth) {
 
-        User user = userRepository.findByUsername(auth.getUsername()).get();
+        User user = userService.getByUsername(auth.getUsername());
 
         BookDescription bookDescription = bookDescriptionService.getById(bookDescriptionId).get();
 
@@ -238,7 +238,7 @@ public class BookController {
 
         Source source = sourceStr.isBlank() ? null : Source.valueOf(sourceStr);
 
-        User currentUser = userRepository.findByUsername(auth.getUsername()).get();
+        User currentUser = userService.getByUsername(auth.getUsername());
 
         ArrayList<String> added = new ArrayList<>();
         ArrayList<String> skipped = new ArrayList<>();
@@ -301,7 +301,7 @@ public class BookController {
         if (bindingResult.hasErrors())
             return "books/addBook";
 
-        User currentUser = userRepository.findByUsername(auth.getUsername()).get();
+        User currentUser = userService.getByUsername(auth.getUsername());
         BookDescription book = userBook.getBookDescription();
         book.setISBN(book.getISBN().replace("-", ""));
 
@@ -315,8 +315,14 @@ public class BookController {
         UserBookMark mark = userBook.getUserBookMark();
         mark.setUser(currentUser);
 
+        book.setLanguage(book.getLanguage().isBlank() ? null : book.getLanguage());
+        book.setPublisher(book.getPublisher().isBlank() ? null : book.getPublisher());
+        book.setCover(book.getCover().isBlank() ? null : book.getCover());
+        book.setDescription(book.getDescription().isBlank() ? null : book.getDescription());
+
+
         // проверяем, есть ли офиц книга с таким исбн в бд и если да то equals
-        BookDescription verifiedBook =bookDescriptionService.findByISBNVerified(book.getISBN());
+        BookDescription verifiedBook = bookDescriptionService.findByISBNVerified(book.getISBN());
         if(verifiedBook != null && verifiedBook.equals(book)){
             mark.setBookDescription(verifiedBook);
         }
@@ -331,10 +337,10 @@ public class BookController {
         return "redirect:/books/book/" + mark.getId();
     }
 
-
+    @ResponseBody
     @PostMapping("/saveFromSearch")
-    public ResponseEntity<?> saveBookFromSearch(@RequestBody Map<String, Object> bookData,
-                                                @AuthenticationPrincipal UserDetails auth) {
+    public Map<String, Object> saveBookFromSearch(@RequestBody Map<String, Object> bookData) {
+        Map<String, Object> response = new HashMap<>();
         try {
             String title = (String) bookData.get("title");
             String author = (String) bookData.get("author");
@@ -365,9 +371,9 @@ public class BookController {
                 savedBook = bookDescriptionService.save(newBook);
             }
 
-            Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("book", Map.of(
+                    "id", savedBook.getId(),
                     "title", savedBook.getTitle(),
                     "author", savedBook.getAuthor(),
                     "isbn", savedBook.getISBN(),
@@ -375,15 +381,11 @@ public class BookController {
                     "year", savedBook.getYear()
             ));
 
-            return ResponseEntity.ok(response);
-
         } catch (Exception e) {
-            
-            Map<String, Object> response = new HashMap<>();
             response.put("success", false);
             response.put("error", e.getMessage());
-            return ResponseEntity.badRequest().body(response);
         }
+        return response;
     }
 
     @GetMapping("/book/{id}")

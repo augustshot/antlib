@@ -31,7 +31,6 @@
         <div class="card-body text-center">
           <!-- Значок профиля -->
           <div class="profile-avatar">
-            <i class="fas fa-user"></i>
           </div>
 
           <!-- Имя -->
@@ -39,20 +38,18 @@
 
           <!-- Почта -->
           <p class="text-muted small mb-2">
-            <i class="far fa-envelope me-1"></i>
             <span th:text="${user.email} ?: 'reader@antlib.ru'">reader@antlib.ru</span>
           </p>
 
           <!-- Дата регистрации -->
           <p class="text-muted small mb-3">
-            <i class="fas fa-calendar-alt me-1"></i>
             Зарегистрирован:
             <span th:text="${#temporals.format(user.dateJoin, 'dd.MM.yyyy')} ?: '01.01.2024'">01.01.2024</span>
           </p>
 
           <!-- Кнопка редактировать профиль -->
           <a th:href="@{/profile/edit}" class="btn btn-success w-100">
-            <i class="fas fa-edit me-2"></i>Редактировать профиль
+            Редактировать профиль
           </a>
         </div>
       </div>
@@ -64,7 +61,7 @@
       <div class="card mb-4">
         <div class="card-body">
           <h5 class="card-title text-success mb-3">
-            <i class="fas fa-chart-simple me-2"></i>Статистика чтения
+            Статистика чтения
           </h5>
 
           <div class="row g-3">

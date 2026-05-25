@@ -37,7 +37,7 @@ function getBestIsbn(book) {
                 // Ищем ISBN-13
                 let isbn13 = edition.isbn.find(isbn => {
                     let clean = String(isbn).replace(/-/g, '');
-                    return (clean.startsWith('978') || clean.startsWith('979')) && clean.length === 13;
+                    return (clean.startsWith('97')) && clean.length === 13;
                 });
                 if (isbn13) return isbn13;
                 return edition.isbn[0];
@@ -50,7 +50,7 @@ function getBestIsbn(book) {
         // Ищем ISBN-13
         let isbn13 = book.isbn.find(isbn => {
             let clean = String(isbn).replace(/-/g, '');
-            return (clean.startsWith('978') || clean.startsWith('979')) && clean.length === 13;
+            return (clean.startsWith('97'))  && clean.length === 13;
         });
         if (isbn13) return isbn13;
 
@@ -154,7 +154,7 @@ function createBookCard(book) {
 
     const selectBtn = document.createElement('button');
     selectBtn.className = 'btn btn-sm btn-outline-success w-100 select-book-btn';
-    selectBtn.innerHTML = '<i class="fas fa-plus me-1"></i>Выбрать';
+    selectBtn.innerHTML = 'Выбрать';
     selectBtn.addEventListener('click', (e) => {
         e.preventDefault();
         selectBook({
@@ -179,7 +179,7 @@ async function selectBook(book) {
     const selectBtn = event?.target;
     if (selectBtn) {
         selectBtn.disabled = true;
-        selectBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Сохранение...';
+        selectBtn.innerHTML = 'Сохранение...';
     }
 
     try {
@@ -223,7 +223,7 @@ async function selectBook(book) {
     } finally {
         if (selectBtn) {
             selectBtn.disabled = false;
-            selectBtn.innerHTML = '<i class="fas fa-plus me-1"></i>Выбрать';
+            selectBtn.innerHTML = 'Выбрать';
         }
     }
 

@@ -9,7 +9,7 @@ function init(){
     const hiddenIsbn = document.getElementById('hiddenIsbn');
     const formText = document.getElementById('isbnFormText');
 
-    const ISBN13_PATTERN = /^(978)(-?\d){10}$/;
+    const ISBN13_PATTERN = /^(97)(-?\d){11}$/;
     const ISBN10_PATTERN = /^(\d-?){9}\d$/;
 
     function cleanIsbn(isbn) {

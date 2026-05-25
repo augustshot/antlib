@@ -19,6 +19,7 @@ import ru.isu.antlib.repository.UserRepository;
 import ru.isu.antlib.service.LibraryService;
 import ru.isu.antlib.service.RoomService;
 import ru.isu.antlib.service.UserLibraryService;
+import ru.isu.antlib.service.UserService;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -30,7 +31,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class LibraryController {
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
     @Autowired
     private LibraryRepository libraryRepository;
     @Autowired
@@ -47,7 +48,7 @@ public class LibraryController {
     public String libraries(Model model,
                             @AuthenticationPrincipal UserDetails auth){
 
-        User user = userRepository.findByUsername(auth.getUsername()).get();
+        User user = userService.getByUsername(auth.getUsername());
         List<UserLibrary> userLibraries = userLibraryService.getAllByUser(user);
 
         Map<UserLibrary, Integer> userLibrariesMap = new LinkedHashMap<>();
@@ -62,7 +63,7 @@ public class LibraryController {
     public String join(Model model, @RequestParam("inviteCode") String inviteCode,
                        @AuthenticationPrincipal UserDetails auth,
                        RedirectAttributes redirectAttributes){
-        User user = userRepository.findByUsername(auth.getUsername()).get();
+        User user = userService.getByUsername(auth.getUsername());
 
         Library library = libraryService.getByInviteCode(inviteCode);
         if(library != null){
@@ -81,7 +82,7 @@ public class LibraryController {
 
     @GetMapping("/library/{id}")
     public String library(Model model, @PathVariable Integer id, @AuthenticationPrincipal UserDetails auth) throws Exception {
-        User user = userRepository.findByUsername(auth.getUsername()).get();
+        User user = userService.getByUsername(auth.getUsername());
         Library library = libraryService.getById(id);
         List<UserLibrary> members = userLibraryService.findByLibraryId(id);
         List<Room> rooms = roomService.getRoomsByLibraryId(library.getId());

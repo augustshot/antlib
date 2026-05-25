@@ -26,6 +26,10 @@ public class UserBookMarkService {
         return userBookMarkRepository.save(userBookMark);
     }
 
+    public List<UserBookMark> getAllByUser(User user){
+        return userBookMarkRepository.findAllByUserId(user.getId());
+    }
+
     public UserBookMark getByUserBookMarkId(Integer id){
         return userBookMarkRepository.findBookByUserBookMarkId(id);
     }
@@ -47,8 +51,8 @@ public class UserBookMarkService {
             }
     }
 
-    public long[] getStats(Integer userId){
-        long[] stats = new long[4];
+    public int[] getStats(Integer userId){
+        int[] stats = new int[4];
         stats[0] = userBookMarkRepository.countByUserIdAndStatus(userId, Status.PLANNED);
         stats[1] = userBookMarkRepository.countByUserIdAndStatus(userId, Status.READING);
         stats[2] = userBookMarkRepository.countByUserIdAndStatus(userId, Status.FINISHED);

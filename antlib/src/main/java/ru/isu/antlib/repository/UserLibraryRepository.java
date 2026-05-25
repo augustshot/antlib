@@ -21,7 +21,7 @@ public interface UserLibraryRepository extends JpaRepository<UserLibrary, UserLi
     List<UserLibrary> findAllByUserId(@Param("userId") Integer userId);
 
     @Query("SELECT ul.user FROM UserLibrary ul WHERE ul.library.id = :libraryId AND ul.role = 'OWNER'")
-    User findOwnerByLibraryId(@Param("libraryId") Integer libraryId);
+    User findOwnerByLibraryId(@Param("libraryId") Integer libraryId); // !!!
 
     @Query("SELECT ul FROM UserLibrary ul JOIN FETCH ul.user WHERE ul.library.id = :libraryId")
     List<UserLibrary> findMembersByLibraryId(@Param("libraryId") Integer libraryId);

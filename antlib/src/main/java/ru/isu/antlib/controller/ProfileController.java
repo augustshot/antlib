@@ -33,10 +33,10 @@ public class ProfileController {
 
     @GetMapping
     public String profile(Model model, @AuthenticationPrincipal UserDetails auth){
-        User user = userRepository.findByUsername(auth.getUsername()).get();
+        User user = userService.getByUsername(auth.getUsername());
         model.addAttribute("user", user);
 
-        long[] stats = userBookMarkService.getStats(user.getId());
+        int[] stats = userBookMarkService.getStats(user.getId());
 
         model.addAttribute("planned", stats[0]);
         model.addAttribute("reading", stats[1]);
@@ -48,7 +48,7 @@ public class ProfileController {
 
     @GetMapping("/edit")
     public String edit(Model model, @AuthenticationPrincipal UserDetails auth){
-        User user = userRepository.findByUsername(auth.getUsername()).get();
+        User user = userService.getByUsername(auth.getUsername());
         model.addAttribute("user", user);
         return "user/editProfile";
     }
@@ -56,13 +56,10 @@ public class ProfileController {
     @PostMapping("/edit")
     public String update(Model model, @AuthenticationPrincipal UserDetails auth,
                          @ModelAttribute("user") User edited, @CurrentSecurityContext SecurityContext securityContext){
-        User user = userRepository.findByUsername(auth.getUsername()).get();
+        User user = userService.getByUsername(auth.getUsername());
         user.setUsername(edited.getUsername());
         user.setEmail(edited.getEmail());
 
-//        if(!passwordEncoder.matches(edited.getPassword(), user.getPassword())){
-//            user.setPassword(edited.getPassword());
-//        }
 
         userService.update(user, edited.getPassword());
 
@@ -77,8 +74,9 @@ public class ProfileController {
 
     @PostMapping("/delete")
     public String delete(Model model, @AuthenticationPrincipal UserDetails auth){
-        User user = userRepository.findByUsername(auth.getUsername()).get();
-        return "";
+        User user = userService.getByUsername(auth.getUsername());
+        userService.delete(user);
+        return "redirect:/logout";
     }
 
 

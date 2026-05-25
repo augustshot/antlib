@@ -628,7 +628,7 @@ function initViewModes() {
         cancelLayoutBtn = document.createElement('button');
         cancelLayoutBtn.id = 'cancelLayoutBtn';
         cancelLayoutBtn.className = 'btn btn-sm btn-outline-secondary d-none me-2';
-        cancelLayoutBtn.innerHTML = '<i class="bi bi-x-lg me-1"></i>Отмена';
+        cancelLayoutBtn.innerHTML = 'Отмена';
         // Вставляем перед кнопкой сохранения
         if (saveLayoutBtn) saveLayoutBtn.parentNode.insertBefore(cancelLayoutBtn, saveLayoutBtn);
     }
@@ -680,7 +680,7 @@ function initViewModes() {
         saveLayoutBtn.addEventListener('click', async () => {
             saveLayoutBtn.disabled = true;
             const originalText = saveLayoutBtn.innerHTML;
-            saveLayoutBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Сохранение...';
+            saveLayoutBtn.innerHTML = ' Сохранение...';
 
             try {
                 const idsToDelete = shelvesData.filter(s => s.markedForDeletion).map(s => s.id);
@@ -1563,7 +1563,7 @@ async function performSearch() {
 
     } catch (error) {
         console.error('Search error:', error);
-        resultsMessage.innerHTML = '<i class="bi bi-x-circle"></i> Ошибка поиска';
+        resultsMessage.innerHTML = 'Ошибка поиска';
         showNotification('Ошибка при поиске', 'error');
     }
 }

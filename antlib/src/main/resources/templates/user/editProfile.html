@@ -79,14 +79,14 @@
                     <div class="form-section">
                         <div class="d-flex justify-content-between gap-3">
                             <a th:href="@{/profile}" class="btn btn-outline-secondary px-4">
-                                <i class="bi bi-arrow-left me-1"></i>Отмена
+                               Отмена
                             </a>
                             <div class="d-flex gap-2">
                                 <button type="button" class="btn btn-outline-danger px-4" id="deleteProfileBtn">
-                                    <i class="bi bi-trash3 me-1"></i>Удалить профиль
+                                    Удалить профиль
                                 </button>
                                 <button type="button" id="submit-button" class="btn btn-success px-4">
-                                    <i class="bi bi-check-lg me-1"></i>Сохранить изменения
+                                    Сохранить изменения
                                 </button>
                             </div>
                         </div>
@@ -103,21 +103,21 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="confirmDeleteModalLabel">
-                    <i class="bi bi-exclamation-triangle-fill me-2"></i>Подтверждение удаления
+                    Подтверждение удаления
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
             </div>
             <div class="modal-body">
                 <p>Вы уверены, что хотите удалить свой профиль?</p>
                 <p class="text-muted small mt-2">
-                    <i class="bi bi-info-circle me-1"></i>Это действие нельзя отменить. Все ваши данные будут потеряны.
+                    Это действие нельзя отменить. Все ваши данные будут потеряны.
                 </p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
                 <form th:action="@{/profile/delete}" method="post" id="deleteForm">
                     <button type="submit" class="btn btn-danger">
-                        <i class="bi bi-trash3 me-1"></i>Удалить профиль
+                        Удалить профиль
                     </button>
                 </form>
             </div>

@@ -2,6 +2,7 @@ package ru.isu.antlib.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.isu.antlib.model.Library;
 import ru.isu.antlib.model.Shelf;
 import ru.isu.antlib.model.ShelfBook;
@@ -22,6 +23,7 @@ public class ShelfBookService {
         return shelfBookRepository.findByShelfId(shelfId);
     }
 
+    @Transactional
     public ShelfBook save(ShelfBook shelfBook){
         return shelfBookRepository.save(shelfBook);
     }
@@ -35,11 +37,9 @@ public class ShelfBookService {
            return shelfBookRepository.searchBooksInLibrary(library.getId(), search);
     }
 
+    @Transactional
     public void deleteById(Integer id){
         shelfBookRepository.deleteById(id);
     }
 
-    public Optional<ShelfBook> getById(Integer id){
-        return shelfBookRepository.findById(id);
-    }
 }

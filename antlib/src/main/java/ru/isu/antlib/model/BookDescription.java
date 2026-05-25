@@ -60,7 +60,15 @@ public class BookDescription {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         BookDescription that = (BookDescription) o;
-        return Objects.equals(title, that.title) && Objects.equals(author, that.author) && Objects.equals(ISBN, that.ISBN) && Objects.equals(year, that.year) && Objects.equals(pages, that.pages) && Objects.equals(language, that.language) && Objects.equals(publisher, that.publisher) && Objects.equals(cover, that.cover) && Objects.equals(description, that.description);
+        return Objects.equals(title, that.title) &&
+                Objects.equals(author, that.author) &&
+                Objects.equals(ISBN, that.ISBN) &&
+                Objects.equals(year, that.year) &&
+                Objects.equals(pages, that.pages) &&
+                Objects.equals(language, that.language) &&
+                Objects.equals(publisher, that.publisher) &&
+                Objects.equals(cover, that.cover) &&
+                Objects.equals(description, that.description);
     }
 
 }

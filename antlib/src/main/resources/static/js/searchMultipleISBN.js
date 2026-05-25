@@ -9,7 +9,7 @@ function init() {
     const form = document.getElementById('addMultipleForm');
     const formText = document.getElementById('multipleIsbnFormText');
 
-    const ISBN13_PATTERN = /^(978|979)(-?\d){10}$/;
+    const ISBN13_PATTERN = /^(97)(-?\d){11}$/;
     const ISBN10_PATTERN = /^(\d-?){9}\d$/;
 
     function cleanIsbn(isbn) {

@@ -55,6 +55,7 @@ public class LibraryService {
         return library.orElse(null);
     }
 
+    @Transactional
     public void deleteById(Integer id){
         libraryRepository.deleteById(id);
     }

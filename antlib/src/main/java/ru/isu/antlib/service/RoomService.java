@@ -2,6 +2,7 @@ package ru.isu.antlib.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.isu.antlib.model.Room;
 import ru.isu.antlib.repository.RoomRepository;
 
@@ -17,6 +18,7 @@ public class RoomService {
         return roomRepository.findByLibraryId(libraryId);
     }
 
+    @Transactional
     public Room save(Room room){
         return roomRepository.save(room);
     }
@@ -29,6 +31,7 @@ public class RoomService {
         return roomRepository.findById(roomId);
     }
 
+    @Transactional
     public void deleteById(Integer id){
         roomRepository.deleteById(id);
     }

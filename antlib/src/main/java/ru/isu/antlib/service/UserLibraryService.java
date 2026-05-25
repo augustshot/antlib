@@ -34,6 +34,7 @@ public class UserLibraryService {
         return userLibraryRepository.findByUserIdAndLibraryId(userId, libraryId);
     }
 
+    @Transactional
     public void delete(UserLibrary userLibrary){
         userLibraryRepository.delete(userLibrary);
     }

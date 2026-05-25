@@ -19,7 +19,7 @@ public class BookDescriptionValidator implements Validator {
         UserBookDto userBook = (UserBookDto) o;
         BookDescription userBookMark = userBook.getBookDescription();
         String isbn = userBookMark.getISBN().replace("-", "");
-        String isbn13 = "^(978|979)\\d{10}$";
+        String isbn13 = "^(97)\\d{11}$";
         String isbn10 = "^\\d{9}[\\dX]$";
         if(isbn != null && !isbn.isBlank() && !Pattern.matches(isbn10, isbn) && !Pattern.matches(isbn13, isbn)){
             e.rejectValue("bookDescription.ISBN", "ISBN.InvalidFormat", "Некорректный формат ISBN");

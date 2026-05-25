@@ -8,9 +8,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.isu.antlib.model.User;
+import ru.isu.antlib.model.UserBookMark;
 import ru.isu.antlib.repository.UserRepository;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -19,10 +21,14 @@ public class UserService implements UserDetailsService{
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    private final UserBookMarkService userBookMarkService;
+
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
+                       UserBookMarkService userBookMarkService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.userBookMarkService = userBookMarkService;
     }
 
     @Override
@@ -63,16 +69,16 @@ public class UserService implements UserDetailsService{
         return users;
     }
 
-    public User findById(Integer userId){
-        User user = this.userRepository
-                .findById(userId)
-                .orElseThrow(()->new UsernameNotFoundException(
-                        "Failed to retrieve user by id" + userId));
-        return user;
+    public User getByUsername(String username) {
+        return userRepository.findByUsername(username).orElse(null);
     }
 
-    public User findByUsername(String username) {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+    @Transactional
+    public void delete(User user) {
+        List<UserBookMark> marks = userBookMarkService.getAllByUser(user);
+
+        // чтобы удалились все BookDescription с verified = 0, созданные и используемые только этим пользователем
+        for (UserBookMark mark : marks) userBookMarkService.deleteBook(mark);
+        userRepository.delete(user);
     }
 }
