@@ -720,7 +720,7 @@ public Map<String, Object> deleteRoom(@PathVariable Integer libraryId,
             }
 
             for (Integer bookMarkId : bookMarkIds) {
-                UserBookMark userBookMark = userBookMarkService.getByUserBookMarkId(bookMarkId);
+                UserBookMark userBookMark = userBookMarkService.getById(bookMarkId);
 
                 ShelfBook shelfBook = new ShelfBook();
                 shelfBook.setShelf(shelf);

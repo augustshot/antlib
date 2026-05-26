@@ -40,7 +40,6 @@ public class LibraryController {
     private LibraryService libraryService;
     @Autowired
     private RoomService roomService;
-
     @Autowired
     private UserLibraryRepository userLibraryRepository;
 
@@ -88,8 +87,7 @@ public class LibraryController {
         List<Room> rooms = roomService.getRoomsByLibraryId(library.getId());
 
         boolean isMember = userLibraryService.isMember(user, library);
-        User owner = userLibraryService.getOwner(library);
-        if (!isMember && !owner.getId().equals(user.getId())) {
+        if (!isMember) {
             return "error/403";
         }
 

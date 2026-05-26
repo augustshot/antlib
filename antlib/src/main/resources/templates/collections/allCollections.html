@@ -8,44 +8,74 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
-    <link th:href="@{/css/collections.css}" rel="stylesheet"/>
+    <link th:href="@{/css/collection.css}" rel="stylesheet"/>
+    <script th:src="@{/js/addCollection.js}" src="/js/addCollection.js" type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
 
 <div th:replace="~{header :: header}"></div>
 
+
 <div class="container mt-4">
     <!-- Заголовок и кнопка добавления -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="text-success mb-0">Мои коллекции</h2>
-        <a th:href="@{/collections/add}" class="btn btn-outline-success px-4 py-2">
+        <button type="button" class="btn btn-outline-success px-4 py-2" data-bs-toggle="modal" data-bs-target="#createCollectionModal">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1">
                 <line x1="12" y1="5" x2="12" y2="19"></line>
                 <line x1="5" y1="12" x2="19" y2="12"></line>
             </svg>
             Создать коллекцию
-        </a>
+        </button>
     </div>
 
-    <!-- Список коллекций -->
-    <div th:if="${collections != null and !collections.isEmpty()}">
-        <div class="row g-4">
-            <div th:each="collection : ${collections}" class="col-md-6 col-lg-4">
+    <div class="d-flex justify-content-end mb-3">
+        <div class="btn-group btn-group-sm">
+            <a th:href="@{/collections(sort='name', dir=${sort == 'name' and dir == 'asc' ? 'desc' : 'asc'}, page=${page.number})}"
+               class="btn btn-outline-success"
+               th:classappend="${sort == 'name'} ? 'active' : ''">
+                По названию
+                <span th:if="${sort == 'name' and dir == 'asc'}">↑</span>
+                <span th:if="${sort == 'name' and dir == 'desc'}">↓</span>
+            </a>
+            <a th:href="@{/collections(sort='lastUpdate', dir=${sort == 'lastUpdate' and dir == 'asc' ? 'desc' : 'asc'}, page=${page.number})}"
+               class="btn btn-outline-success"
+               th:classappend="${sort == 'lastUpdate' or sort == null} ? 'active' : ''">
+                По дате обновления
+                <span th:if="${(sort == 'lastUpdate' or sort == null) and (dir == 'asc' or dir == null)}">↑</span>
+                <span th:if="${(sort == 'lastUpdate' or sort == null) and dir == 'desc'}">↓</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Сетка карточек коллекций -->
+    <div th:if="${page != null and !page.content.isEmpty()}">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-3 row-cols-xl-4 g-4">
+            <div th:each="collection : ${page.content}" class="col">
                 <div class="card collection-card h-100">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h5 class="card-title text-success mb-0" th:text="${collection.name}">Название коллекции</h5>
-                        </div>
-                        <p class="card-text text-muted small" th:text="${collection.description}">Описание коллекции</p>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title text-success mb-2" th:text="${collection.name}">Название коллекции</h5>
 
-                        <hr class="my-3">
+                        <!-- Описание коллекции (ограничиваем длину) -->
+                        <p class="card-text text-muted small flex-grow-1 mb-3"
+                           th:if="${collection.description != null and !collection.description.isEmpty()}"
+                           th:text="${#strings.length(collection.description) > 100 ? #strings.substring(collection.description, 0, 100) + '...' : collection.description}">
+                            Описание коллекции
+                        </p>
+                        <p class="card-text text-muted small fst-italic mb-3"
+                           th:unless="${collection.description != null and !collection.description.isEmpty()}">
 
-                        <div class="d-flex justify-content-between align-items-center">
+                        </p>
+
+                        <hr class="my-2">
+
+                        <div class="d-flex justify-content-between align-items-center mt-auto">
                             <div class="small text-muted">
-                                <i class="bi bi-book me-1"></i>
-                                <span th:text="${collection.bookCount}">0</span> книг
+                                Изменено:
+                                <span th:text="${#temporals.format(collection.lastUpdate, 'dd.MM.yyyy')}"></span>
                             </div>
-                            <a th:href="@{/collections/{id}(id=${collection.id})}" class="btn btn-sm btn-outline-success">
+                            <a th:href="@{/collections/collection/{id}(id=${collection.id})}" class="btn btn-sm btn-outline-success">
                                 Перейти
                             </a>
                         </div>
@@ -56,12 +86,76 @@
     </div>
 
     <!-- Если нет коллекций -->
-    <div th:unless="${collections != null and !collections.isEmpty()}" class="text-center py-5">
+    <div th:unless="${page != null and !page.content.isEmpty()}" class="text-center py-5">
         <i class="bi bi-collection fs-1 text-muted"></i>
         <p class="text-muted mt-3 mb-0">У вас ещё нет коллекций</p>
     </div>
+
+
+    <div class="text-center mt-4" th:if="${page.totalPages > 1}">
+        <nav>
+            <ul class="pagination justify-content-center">
+                <li th:class="${page.first} ? 'page-item disabled' : 'page-item'">
+                    <a th:if="${!page.first}"
+                       th:href="@{/collections(page=${page.number - 1}, sort=${sort}, dir=${dir})}"
+                       class="page-link text-success">Назад</a>
+                    <span th:if="${page.first}" class="page-link text-secondary">Назад</span>
+                </li>
+
+                <li class="page-item disabled">
+                    <span class="page-link">
+                        <span th:text="${page.number + 1}"></span> / <span th:text="${page.totalPages}"></span>
+                    </span>
+                </li>
+
+                <li th:class="${page.last} ? 'page-item disabled' : 'page-item'">
+                    <a th:if="${!page.last}"
+                       th:href="@{/collections(page=${page.number + 1}, sort=${sort}, dir=${dir})}"
+                       class="page-link text-success">Далее</a>
+                    <span th:if="${page.last}" class="page-link text-secondary">Далее</span>
+                </li>
+            </ul>
+        </nav>
+    </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Модальное окно создания коллекции -->
+<div class="modal fade" id="createCollectionModal" tabindex="-1" aria-labelledby="createCollectionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createCollectionModalLabel">
+                    <i class="bi bi-collection-fill me-2"></i>Создать коллекцию
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createCollectionForm">
+                    <div class="mb-3">
+                        <label for="collectionName" class="form-label fw-bold">
+                            Название <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" class="form-control" id="collectionName" name="name"
+                               placeholder="Введите название коллекции" autocomplete="off">
+                        <div id="name-error" class="text-danger small mt-1 d-none"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="collectionDescription" class="form-label fw-bold">
+                            Описание <span class="text-muted small">(необязательно)</span>
+                        </label>
+                        <textarea class="form-control" id="collectionDescription" name="description"
+                                  rows="3" placeholder="Введите описание коллекции..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-success" id="createCollectionBtn">Создать</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>

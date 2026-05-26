@@ -30,7 +30,7 @@ public class UserBookMarkService {
         return userBookMarkRepository.findAllByUserId(user.getId());
     }
 
-    public UserBookMark getByUserBookMarkId(Integer id){
+    public UserBookMark getById(Integer id){
         return userBookMarkRepository.findBookByUserBookMarkId(id);
     }
 
@@ -66,5 +66,9 @@ public class UserBookMarkService {
 
     public List<UserBookMark> getByUserAndSource(User user, Source source){
         return userBookMarkRepository.findByUserIdAndSource(user.getId(), source);
+    }
+
+    public List<UserBookMark> getDistinctByUserAndSearch(User user, String search) {
+        return userBookMarkRepository.findDistinctByUserIdAndSearch(user.getId(), search);
     }
 }

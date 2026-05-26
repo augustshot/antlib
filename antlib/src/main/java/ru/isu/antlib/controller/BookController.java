@@ -7,7 +7,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -315,10 +314,7 @@ public class BookController {
         UserBookMark mark = userBook.getUserBookMark();
         mark.setUser(currentUser);
 
-        book.setLanguage(book.getLanguage().isBlank() ? null : book.getLanguage());
-        book.setPublisher(book.getPublisher().isBlank() ? null : book.getPublisher());
-        book.setCover(book.getCover().isBlank() ? null : book.getCover());
-        book.setDescription(book.getDescription().isBlank() ? null : book.getDescription());
+        book = blanksToNulls(book);
 
 
         // проверяем, есть ли офиц книга с таким исбн в бд и если да то equals
@@ -359,7 +355,6 @@ public class BookController {
             if (existingBook != null) {
                 savedBook = existingBook;
             } else {
-                // Создаём новую книгу
                 BookDescription newBook = new BookDescription();
                 newBook.setTitle(title);
                 newBook.setAuthor(author);
@@ -390,14 +385,14 @@ public class BookController {
 
     @GetMapping("/book/{id}")
     public String bookInfo(Model model, @PathVariable Integer id){
-        UserBookMark userBookMark = userBookMarkService.getByUserBookMarkId(id);
+        UserBookMark userBookMark = userBookMarkService.getById(id);
         model.addAttribute("userBookMark", userBookMark);
         return "books/bookInfo";
     }
 
     @GetMapping("/book/edit/{id}")
     public String editBookInfo(Model model, @PathVariable Integer id){
-        UserBookMark userBookMark = userBookMarkService.getByUserBookMarkId(id);
+        UserBookMark userBookMark = userBookMarkService.getById(id);
         UserBookDto userBook = new UserBookDto();
         userBook.setUserBookMark(userBookMark);
         userBook.setBookDescription(userBookMark.getBookDescription());
@@ -420,10 +415,11 @@ public class BookController {
         UserBookMark editedUserBookMark = userBook.getUserBookMark();
         BookDescription editedBook = userBook.getBookDescription();
 
-        UserBookMark existingUserBookMark = userBookMarkService.getByUserBookMarkId(id);
+        UserBookMark existingUserBookMark = userBookMarkService.getById(id);
         BookDescription existingBook = existingUserBookMark.getBookDescription();
 
         editedBook.setISBN(editedBook.getISBN().replace("-", ""));
+        blanksToNulls(editedBook);
 
         // проверяем какую книгу поменяли
         Boolean isVerified = existingBook.getVerified();
@@ -472,7 +468,7 @@ public class BookController {
     
     @PostMapping("/book/delete/{id}")
     public String deleteBook(@PathVariable Integer id) {
-        UserBookMark userBook = userBookMarkService.getByUserBookMarkId(id);
+        UserBookMark userBook = userBookMarkService.getById(id);
         userBookMarkService.deleteBook(userBook);
         return "redirect:/books";
     }
@@ -483,4 +479,11 @@ public class BookController {
         binder.addValidators(new BookDescriptionValidator());
     }
 
+    private BookDescription blanksToNulls(BookDescription book){
+        book.setLanguage(book.getLanguage().isBlank() ? null : book.getLanguage());
+        book.setPublisher(book.getPublisher().isBlank() ? null : book.getPublisher());
+        book.setCover(book.getCover().isBlank() ? null : book.getCover());
+        book.setDescription(book.getDescription().isBlank() ? null : book.getDescription());
+        return book;
+    }
 }

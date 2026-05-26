@@ -3,6 +3,7 @@ package ru.isu.antlib.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,11 +26,14 @@ public class Collection {
     private User user;
 
     @ManyToMany
-    @JoinTable(name="book_collection",
+    @JoinTable(name="collection_book",
             joinColumns = @JoinColumn(name="collection_id"),
             inverseJoinColumns = @JoinColumn(name="user_book_mark_id")
     )
-    private Set<UserBookMark> userBooks = new HashSet<>();
+    private Set<UserBookMark> books = new HashSet<>();
+
+    @Column(name="last_update")
+    private LocalDateTime lastUpdate;
 
 
 }

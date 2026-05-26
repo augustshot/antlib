@@ -43,4 +43,13 @@ public interface UserBookMarkRepository extends JpaRepository<UserBookMark, Inte
 
     List<UserBookMark> findByUserIdAndSource(Integer userId, Source source);
 
+    @Query("SELECT DISTINCT ubm FROM UserBookMark ubm " +
+            "JOIN FETCH ubm.bookDescription bd " +
+            "WHERE ubm.user.id = :userId " +
+            "AND (LOWER(bd.title) LIKE LOWER(:search) " +
+            "OR LOWER(bd.author) LIKE LOWER(:search) " +
+            "OR bd.ISBN LIKE :search)")
+    List<UserBookMark> findDistinctByUserIdAndSearch(@Param("userId") Integer userId,
+                                               @Param("search") String search);
+
 }

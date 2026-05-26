@@ -11,7 +11,6 @@ import java.util.List;
 @Repository
 public interface BookDescriptionRepository extends JpaRepository<BookDescription, Integer>, JpaSpecificationExecutor<UserBookMark> {
 
-//    ищем официальную книжку
     BookDescription findByISBNAndVerifiedTrue(String isbn);
     List<BookDescription> findAllByISBNAndVerifiedFalse(String isbn);
 

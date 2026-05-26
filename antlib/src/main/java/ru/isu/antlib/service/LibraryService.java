@@ -61,7 +61,7 @@ public class LibraryService {
     }
 
     public boolean existsByNameAndOwner(String name, User owner) {
-        return libraryRepository.findByNameAndOwnerId(name.trim(), owner.getId()).isPresent();
+        return libraryRepository.findByNameAndOwnerId(name, owner.getId()).isPresent();
     }
 
 
