@@ -12,7 +12,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.isu.antlib.model.*;
 import ru.isu.antlib.model.Collection;
+import ru.isu.antlib.repository.CollectionBookRepository;
 import ru.isu.antlib.repository.CollectionRepository;
+import ru.isu.antlib.service.CollectionBookService;
 import ru.isu.antlib.service.CollectionService;
 import ru.isu.antlib.service.UserBookMarkService;
 import ru.isu.antlib.service.UserService;
@@ -29,6 +31,11 @@ public class CollectionController {
     private CollectionService collectionService;
     @Autowired
     private CollectionRepository collectionRepository;
+
+    @Autowired
+    private CollectionBookService collectionBookService;
+    @Autowired
+    private CollectionBookRepository collectionBookRepository;
 
     @Autowired
     private UserBookMarkService userBookMarkService;
@@ -101,7 +108,10 @@ public class CollectionController {
     }
 
     @GetMapping("/collection/{id}")
-    public String collection(Model model, @PathVariable Integer id, @AuthenticationPrincipal UserDetails auth) throws Exception {
+    public String collection(Model model, @PathVariable Integer id, @AuthenticationPrincipal UserDetails auth,
+                             @RequestParam(required = false) String sort,
+                             @RequestParam(required = false) String dir,
+                             Pageable page){
         User user = userService.getByUsername(auth.getUsername());
 
         Collection collection = collectionService.getById(id).orElse(null);
@@ -114,7 +124,23 @@ public class CollectionController {
             return "error/403";
         }
 
+        String sortField = "userBookMark.bookDescription.title";
+        Sort.Direction direction = Sort.Direction.ASC;
+
+        if (sort != null && !sort.isEmpty()) {
+            sortField = sort;
+            direction = (dir != null && dir.equalsIgnoreCase("desc")) ? Sort.Direction.DESC : Sort.Direction.ASC;
+        }
+
+        Pageable pageable = PageRequest.of(page.getPageNumber(), 30, Sort.by(direction, sortField));
+
+        Page<UserBookMark> pageResult = collectionBookRepository.findByCollectionId(id, pageable);
+
+        model.addAttribute("sort", sortField);
+        model.addAttribute("dir", direction.toString().toLowerCase());
+        model.addAttribute("page", pageResult);
         model.addAttribute("collection", collection);
+
         return "collections/collection";
     }
 
@@ -196,6 +222,7 @@ public class CollectionController {
         return response;
     }
 
+
     @ResponseBody
     @GetMapping("/{collectionId}/books")
     public Map<String, Object> getAvailableBooksForCollection(@PathVariable Integer collectionId,
@@ -221,7 +248,7 @@ public class CollectionController {
                 return response;
             }
 
-            Set<Integer> existingBookIds = collection.getBooks()
+            Set<Integer> existingBookIds = collectionBookService.getAllByCollectionId(collectionId)
                     .stream()
                     .map(book -> book.getId())
                     .collect(Collectors.toSet());
@@ -297,7 +324,8 @@ public class CollectionController {
 
             for (Integer bookMarkId : bookIds) {
                 UserBookMark userBookMark = userBookMarkService.getById(bookMarkId);
-                collection.getBooks().add(userBookMark);
+                CollectionBook collectionBook = new CollectionBook(collection, userBookMark);
+                collectionBookService.save(collectionBook);
                 collectionService.save(collection);
             }
 
@@ -338,7 +366,9 @@ public class CollectionController {
                 return response;
             }
 
-            collectionService.deleteCollectionBook(collectionId, bookId);
+            CollectionBook collectionBook = collectionBookService.getByCollectionIdAndBookId(collectionId, bookId);
+
+            collectionBookService.delete(collectionBook);
 
             response.put("success", true);
             response.put("message", "Книга удалена из коллекции");

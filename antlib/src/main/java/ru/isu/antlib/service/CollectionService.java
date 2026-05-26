@@ -43,12 +43,5 @@ public class CollectionService {
         return collectionRepository.findById(id);
     }
 
-    @Transactional
-    public void deleteCollectionBook(Integer collectionId, Integer bookId){
-        Collection collection = collectionRepository.findById(collectionId).get();
-        UserBookMark book = userBookMarkService.getById(bookId);
-        collection.getBooks().remove(book);
-        collectionRepository.save(collection);
-    };
 
 }

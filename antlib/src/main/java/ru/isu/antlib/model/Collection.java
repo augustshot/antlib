@@ -25,12 +25,6 @@ public class Collection {
     @JoinColumn(name="user_id")
     private User user;
 
-    @ManyToMany
-    @JoinTable(name="collection_book",
-            joinColumns = @JoinColumn(name="collection_id"),
-            inverseJoinColumns = @JoinColumn(name="user_book_mark_id")
-    )
-    private Set<UserBookMark> books = new HashSet<>();
 
     @Column(name="last_update")
     private LocalDateTime lastUpdate;

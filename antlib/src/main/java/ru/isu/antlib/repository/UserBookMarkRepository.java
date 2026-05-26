@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.isu.antlib.model.Source;
 import ru.isu.antlib.model.Status;
+import ru.isu.antlib.model.User;
 import ru.isu.antlib.model.UserBookMark;
 
 import java.util.List;

@@ -71,4 +71,5 @@ public class UserBookMarkService {
     public List<UserBookMark> getDistinctByUserAndSearch(User user, String search) {
         return userBookMarkRepository.findDistinctByUserIdAndSearch(user.getId(), search);
     }
+
 }
