@@ -103,7 +103,7 @@ function createBookCard(book) {
             this.style.display = 'none';
             const placeholder = document.createElement('div');
             placeholder.className = 'book-cover-placeholder d-flex align-items-center justify-content-center h-100';
-            placeholder.textContent = '📖';
+            placeholder.textContent = 'Нет обложки';
             coverWrapper.innerHTML = '';
             coverWrapper.appendChild(placeholder);
         };
@@ -111,7 +111,9 @@ function createBookCard(book) {
     } else {
         const placeholder = document.createElement('div');
         placeholder.className = 'book-cover-placeholder d-flex align-items-center justify-content-center h-100';
-        placeholder.textContent = '📖';
+        placeholder.textContent = 'Нет обложки';
+        placeholder.style.fontSize = '2rem';
+        placeholder.style.color = 'rgb(147, 157, 170)';
         coverWrapper.appendChild(placeholder);
     }
     cardDiv.appendChild(coverWrapper);
@@ -285,11 +287,15 @@ async function performSearch(page = 1) {
     const title = document.getElementById('searchTitle')?.value || '';
     const author = document.getElementById('searchAuthor')?.value || '';
 
+      const errorSpan = document.getElementById('searchErrorText');
+
     if (!title && !author) {
-        alert('Введите название или автора для поиска');
+       errorSpan.textContent = 'Введите название или автора для поиска';
+       errorSpan.style.display = 'inline';
         return;
     }
 
+    errorSpan.style.display = 'none';
     currentSearchQuery = { title, author };
     currentPage = page;
 

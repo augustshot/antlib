@@ -9,6 +9,7 @@ import ru.isu.antlib.model.*;
 import ru.isu.antlib.repository.BookDescriptionRepository;
 import ru.isu.antlib.repository.UserBookMarkRepository;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,15 +52,6 @@ public class UserBookMarkService {
             }
     }
 
-    public int[] getStats(Integer userId){
-        int[] stats = new int[4];
-        stats[0] = userBookMarkRepository.countByUserIdAndStatus(userId, Status.PLANNED);
-        stats[1] = userBookMarkRepository.countByUserIdAndStatus(userId, Status.READING);
-        stats[2] = userBookMarkRepository.countByUserIdAndStatus(userId, Status.FINISHED);
-        stats[3] = userBookMarkRepository.countByUserIdAndStatus(userId, Status.POSTPONED);
-        return stats;
-    }
-
     public List<UserBookMark> getByUserAndSourceAndSearch(User user, Source source, String search){
         return userBookMarkRepository.findByUserIdAndSourceAndSearch(user.getId(), source, search);
     }
@@ -71,5 +63,44 @@ public class UserBookMarkService {
     public List<UserBookMark> getDistinctByUserAndSearch(User user, String search) {
         return userBookMarkRepository.findDistinctByUserIdAndSearch(user.getId(), search);
     }
+
+    // статистика
+
+    public int[] getStatusStats(Integer userId){
+        int[] stats = new int[5];
+        stats[0] = userBookMarkRepository.countByUserIdAndStatus(userId, Status.PLANNED);
+        stats[1] = userBookMarkRepository.countByUserIdAndStatus(userId, Status.READING);
+        stats[2] = userBookMarkRepository.countByUserIdAndStatus(userId, Status.FINISHED);
+        stats[3] = userBookMarkRepository.countByUserIdAndStatus(userId, Status.POSTPONED);
+        stats[4] = userBookMarkRepository.countByUserIdAndNoStatus(userId);
+
+        return stats;
+    }
+
+    public int[] getSourceStats(Integer userId){
+        int[] stats = new int[5];
+        stats[0] = userBookMarkRepository.countByUserIdAndSource(userId, Source.OWNED);
+        stats[1] = userBookMarkRepository.countByUserIdAndSource(userId, Source.EBOOK);
+        stats[2] = userBookMarkRepository.countByUserIdAndSource(userId, Source.BORROWED);
+        stats[3] = userBookMarkRepository.countByUserIdAndSource(userId, Source.SHARED);
+        stats[4] = userBookMarkRepository.countByUserIdAndNoSource(userId);
+        return stats;
+    }
+
+    public Double getAverageRating(Integer userId){
+        return userBookMarkRepository.getAverageRating(userId);
+    }
+
+    public Integer getTotalPages(Integer userId){
+        return userBookMarkRepository.getTotalPagesByUserIdAndFinished(userId);
+    }
+
+    public List<Object[]> getLanguageStats(Integer userId){
+        return userBookMarkRepository.countByLanguage(userId);
+    }
+
+
+
+
 
 }

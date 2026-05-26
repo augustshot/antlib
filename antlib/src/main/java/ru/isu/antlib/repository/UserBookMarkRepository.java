@@ -29,7 +29,6 @@ public interface UserBookMarkRepository extends JpaRepository<UserBookMark, Inte
     @Query("select ubm from UserBookMark ubm join fetch ubm.bookDescription where ubm.user.id = :userId and ubm.bookDescription.ISBN = :ISBN")
     UserBookMark findBookByUserIdAndISBN(@Param("userId") Integer userId, @Param("ISBN") String isbn);
 
-    int countByUserIdAndStatus(Integer userId, Status status);
 
     @Query("SELECT ubm FROM UserBookMark ubm WHERE ubm.user.id = :userId AND ubm.bookDescription.id = :bookId")
     Optional<UserBookMark> findByUserIdAndBookDescriptionId(@Param("userId") Integer userId,
@@ -52,5 +51,26 @@ public interface UserBookMarkRepository extends JpaRepository<UserBookMark, Inte
             "OR bd.ISBN LIKE :search)")
     List<UserBookMark> findDistinctByUserIdAndSearch(@Param("userId") Integer userId,
                                                @Param("search") String search);
+
+
+    // статистика
+    int countByUserIdAndStatus(Integer userId, Status status);
+
+    @Query("SELECT COUNT(ubm) FROM UserBookMark ubm WHERE ubm.user.id = :userId AND ubm.status IS NULL")
+    int countByUserIdAndNoStatus(@Param("userId") Integer userId);
+
+    int countByUserIdAndSource(Integer userId, Source source);
+
+    @Query("SELECT COUNT(ubm) FROM UserBookMark ubm WHERE ubm.user.id = :userId AND ubm.source IS NULL")
+    Integer countByUserIdAndNoSource(@Param("userId") Integer userId);
+
+    @Query("SELECT SUM(bd.pages) FROM UserBookMark ubm JOIN ubm.bookDescription bd WHERE ubm.user.id = :userId AND ubm.status = 'FINISHED'")
+    Integer getTotalPagesByUserIdAndFinished(@Param("userId") Integer userId);
+
+    @Query("SELECT AVG(ubm.rating) FROM UserBookMark ubm WHERE ubm.user.id = :userId AND ubm.rating IS NOT NULL")
+    Double getAverageRating(@Param("userId") Integer userId);
+
+    @Query("SELECT bd.language, COUNT(bd.language) FROM UserBookMark ubm JOIN ubm.bookDescription bd WHERE ubm.user.id = :userId GROUP BY bd.language")
+    List<Object[]> countByLanguage(@Param("userId") Integer userId);
 
 }

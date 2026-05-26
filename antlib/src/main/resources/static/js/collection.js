@@ -109,8 +109,6 @@ function initDeleteCollection() {
                 if (errorDiv) {
                     errorDiv.classList.remove('d-none');
                     errorDiv.textContent = result.message || 'Ошибка при удалении коллекции';
-                } else {
-                    alert(result.message || 'Ошибка при удалении коллекции');
                 }
                 this.disabled = false;
                 this.innerHTML = 'Удалить';
@@ -121,8 +119,6 @@ function initDeleteCollection() {
             if (errorDiv) {
                 errorDiv.classList.remove('d-none');
                 errorDiv.textContent = 'Ошибка соединения с сервером';
-            } else {
-                alert('Ошибка соединения с сервером');
             }
             this.disabled = false;
             this.innerHTML = 'Удалить';

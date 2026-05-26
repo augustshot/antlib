@@ -46,7 +46,6 @@
     /* Или object-fit: cover, если хотите заполнить весь блок, обрезав края */
 }
 
-/* Заглушка должна соответствовать wrapper */
 .book-cover-placeholder {
     position: absolute;
     top: 0;
