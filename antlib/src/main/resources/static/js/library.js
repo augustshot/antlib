@@ -474,7 +474,6 @@ function initRoomCanvas(roomId) {
     drawShelves();
 }
 
-// Полностью исправленная функция drawShelves() - без скролла, с правильным отображением книг и хендлов
 
 function drawShelves() {
     const canvas = document.getElementById('roomCanvas');

@@ -300,7 +300,7 @@ async function performSearch(page = 1) {
     currentPage = page;
 
     const loadingDiv = document.getElementById('searchLoading');
-//    const resultsDiv = document.getElementById('searchResults');
+    const resultsDiv = document.getElementById('searchResults');
     const emptyDiv = document.getElementById('searchEmpty');
 
     if (loadingDiv) loadingDiv.style.display = 'block';
@@ -366,7 +366,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (titleField) titleField.value = '';
             if (authorField) authorField.value = '';
 
-//            const resultsDiv = document.getElementById('searchResults');
+            const resultsDiv = document.getElementById('searchResults');
             const loadingDiv = document.getElementById('searchLoading');
             const emptyDiv = document.getElementById('searchEmpty');
             const resultsGrid = document.getElementById('searchResultsGrid');
