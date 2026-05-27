@@ -1,4 +1,4 @@
-package ru.isu.antlib.service;
+package ru.isu.antlib.service.report;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class BooksReportExcel extends AbstractXlsxView {
+public class ExcelBooksReport extends AbstractXlsxView {
 
     @Override
     protected void buildExcelDocument(Map<String, Object> input,

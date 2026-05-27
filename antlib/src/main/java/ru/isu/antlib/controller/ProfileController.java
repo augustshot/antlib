@@ -1,7 +1,5 @@
 package ru.isu.antlib.controller;
 
-import jakarta.servlet.http.HttpServletResponse;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -19,17 +17,15 @@ import ru.isu.antlib.model.Status;
 import ru.isu.antlib.model.User;
 import ru.isu.antlib.model.UserBookMark;
 import ru.isu.antlib.repository.UserRepository;
-import ru.isu.antlib.service.BooksReportExcel;
-import ru.isu.antlib.service.StatsReportExcel;
+import ru.isu.antlib.service.report.ExcelBooksReport;
+import ru.isu.antlib.service.report.ExcelStatsReport;
 import ru.isu.antlib.service.UserBookMarkService;
 import ru.isu.antlib.service.UserService;
 
-import javax.swing.text.View;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 
 @Controller
@@ -96,7 +92,7 @@ public class ProfileController {
         User user = userService.getByUsername(auth.getUsername());
         List<UserBookMark> userBookMarks = userBookMarkService.getAllByUser(user);
 
-        ModelAndView view = new ModelAndView(new BooksReportExcel());
+        ModelAndView view = new ModelAndView(new ExcelBooksReport());
         view.addObject("userBookMarks", userBookMarks);
         view.addObject("username", user.getUsername());
         return view;
@@ -107,7 +103,7 @@ public class ProfileController {
         User user = userService.getByUsername(auth.getUsername());
         Integer userId = user.getId();
 
-        ModelAndView view = new ModelAndView(new StatsReportExcel());
+        ModelAndView view = new ModelAndView(new ExcelStatsReport());
 
         List<String> statuses = Arrays.asList(
                 Status.PLANNED.getValue(),

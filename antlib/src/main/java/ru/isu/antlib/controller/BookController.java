@@ -21,6 +21,7 @@ import ru.isu.antlib.exception.BookTimeoutException;
 import ru.isu.antlib.model.*;
 import ru.isu.antlib.repository.UserLibraryRepository;
 import ru.isu.antlib.service.*;
+import ru.isu.antlib.service.parser.BookParser;
 import ru.isu.antlib.specification.UserBookMarkSpecification;
 import ru.isu.antlib.validation.BookDescriptionValidator;
 import ru.isu.antlib.validation.UserBookMarkValidator;
@@ -93,7 +94,7 @@ public class BookController {
 
         String fullSortField = "bookDescription." + sortField;
         Sort sortObj = Sort.by(direction, fullSortField);
-        Pageable pageable = PageRequest.of(page.getPageNumber(), 20, sortObj);
+        Pageable pageable = PageRequest.of(page.getPageNumber(), 15, sortObj);
 
 
         Specification<UserBookMark> spec = Specification.unrestricted();
@@ -148,20 +149,15 @@ public class BookController {
                                  Model model,
                                  @AuthenticationPrincipal UserDetails auth) {
 
-        User user = userService.getByUsername(auth.getUsername());
-
         BookDescription bookDescription = bookDescriptionService.getById(bookDescriptionId).get();
 
         UserBookDto userBook = new UserBookDto();
         userBook.setBookDescription(bookDescription);
 
         userBook.getUserBookMark().setSource(Source.SHARED);
-//        вместо libraryId создаем новую запись ubml
-//        userBook.getUserBookMark().setLibraryId(libraryId);
 
         model.addAttribute("userBook", userBook);
         model.addAttribute("source", Source.SHARED);
-//        model.addAttribute("libraryId", libraryId);
 
         return "books/addBook";
     }
@@ -202,19 +198,13 @@ public class BookController {
             model.addAttribute("userBook", userBook);
 
 
-        } catch (BookNotFoundException e) {
-            // Книга не найдена по ISBN
+        } catch (BookNotFoundException | BookTimeoutException e) {
             model.addAttribute("errorMessage", e.getMessage());
             model.addAttribute("userBook", new UserBookDto());
 
-        } catch (BookTimeoutException e) {
-            // Таймаут при парсинге
-            model.addAttribute("errorMessage", e.getMessage());
-            model.addAttribute("userBook", new UserBookDto());
         } catch (Exception e) {
             model.addAttribute("errorMessage", "Произошла неизвестная ошибка: " + e.getMessage());
             model.addAttribute("userBook", new UserBookDto());
-             // Для отладки
         }
 
         return "books/addBook";

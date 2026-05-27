@@ -1152,6 +1152,14 @@ function openResizeShelfModal(shelfId) {
             newCapacity = newWBlocks * MAX_BOOKS_PER_UNIT;
         }
 
+        const books = shelf.books || [];
+        const currentCount = books.length;
+
+        if (currentCount > newCapacity) {
+            showNotification('Текущее количество книг на полке больше заданной вместимости', 'error');
+            return;
+        }
+
         resizeShelf(shelfId, newWidth, newHeight, newCapacity);
         modal.hide();
     };
@@ -1524,14 +1532,13 @@ async function performSearch() {
         return;
     }
 
-    const resultsDiv = document.getElementById('searchResults');
-    const resultsMessage = document.getElementById('searchResultsMessage');
-    const foundBooksList = document.getElementById('foundBooksList');
+//    const resultsDiv = document.getElementById('searchResults');
+//    const resultsMessage = document.getElementById('searchResultsMessage');
+//    const foundBooksList = document.getElementById('foundBooksList');
     const clearBtn = document.getElementById('clearSearchBtn');
 
-    resultsDiv.style.display = 'block';
-    resultsMessage.innerHTML = '<i class="bi bi-hourglass-split"></i> Поиск...';
-    foundBooksList.innerHTML = '';
+//    resultsDiv.style.display = 'block';
+//    foundBooksList.innerHTML = '';
 
     try {
         const response = await fetch(`/libraries/${libraryId}/books/search?query=${encodeURIComponent(searchTerm)}`);
@@ -1542,10 +1549,10 @@ async function performSearch() {
             isSearchActive = true;
 
             const roomsFound = [...new Set(result.books.map(b => b.roomName))];
-            resultsMessage.innerHTML = `
-                Найдено книг: ${result.books.length}<br>
-                <small>В комнатах: ${roomsFound.join(', ')}</small>
-            `;
+//            resultsMessage.innerHTML = `
+//                Найдено книг: ${result.books.length}<br>
+//                <small>В комнатах: ${roomsFound.join(', ')}</small>
+//            `;
 
             clearBtn.style.display = 'block';
 
@@ -1556,14 +1563,14 @@ async function performSearch() {
 //            showNotification(`Найдено ${result.books.length} книг в ${roomsFound.length} комнатах`, 'info');
 
         } else {
-            resultsMessage.innerHTML = 'Ничего не найдено';
-            foundBooksList.innerHTML = '';
+//            resultsMessage.innerHTML = 'Ничего не найдено';
+//            foundBooksList.innerHTML = '';
 //            clearSearch();
         }
 
     } catch (error) {
         console.error('Search error:', error);
-        resultsMessage.innerHTML = 'Ошибка поиска';
+//        resultsMessage.innerHTML = 'Ошибка поиска';
         showNotification('Ошибка при поиске', 'error');
     }
 }
@@ -1613,13 +1620,13 @@ function clearHighlights() {
 
 // Очистка поиска
 function clearSearch() {
-    const resultsDiv = document.getElementById('searchResults');
+//    const resultsDiv = document.getElementById('searchResults');
     const searchInput = document.getElementById('searchBookInput');
     const clearBtn = document.getElementById('clearSearchBtn');
 
-    resultsDiv.style.display = 'none';
-    document.getElementById('searchResultsMessage').innerHTML = '';
-    document.getElementById('foundBooksList').innerHTML = '';
+//    resultsDiv.style.display = 'none';
+//    document.getElementById('searchResultsMessage').innerHTML = '';
+//    document.getElementById('foundBooksList').innerHTML = '';
     clearBtn.style.display = 'none';
 
     currentSearchResults = [];

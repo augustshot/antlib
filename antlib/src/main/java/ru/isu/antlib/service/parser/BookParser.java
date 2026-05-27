@@ -1,4 +1,4 @@
-package ru.isu.antlib.service;
+package ru.isu.antlib.service.parser;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

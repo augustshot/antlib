@@ -300,10 +300,10 @@
                             <i class="bi bi-search"></i>
                         </button>
                     </div>
-                    <div id="searchResults" class="small text-muted" style="display: none;">
-                        <div class="alert alert-info p-2 mb-2" id="searchResultsMessage"></div>
-                        <div id="foundBooksList" class="list-group" style="max-height: 300px; overflow-y: auto;"></div>
-                    </div>
+<!--                    <div id="searchResults" class="small text-muted" style="display: none;">-->
+<!--                        <div class="alert alert-info p-2 mb-2" id="searchResultsMessage"></div>-->
+<!--                        <div id="foundBooksList" class="list-group" style="max-height: 300px; overflow-y: auto;"></div>-->
+<!--                    </div>-->
                     <hr>
                     <button class="btn btn-sm btn-outline-secondary w-100" id="clearSearchBtn" style="display: none;">
                         Очистить поиск
@@ -384,10 +384,10 @@
                                 class="btn btn-sm btn-outline-danger remove-member-btn"
                                 th:data-user-id="${member.user.id}"
                                 th:data-username="${member.user.username}">
+                            <i class="bi bi-x-lg"></i>
 
                         </button>
                         <span th:if="${isOwner and member.role.name() == 'OWNER'}" class="text-muted small">
-                            <i class="bi bi-crown"></i>
                         </span>
                     </div>
                 </div>

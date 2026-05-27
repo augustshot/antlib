@@ -20,10 +20,6 @@ public class CollectionService {
     @Autowired
     private UserBookMarkService userBookMarkService;
 
-    public List<Collection> getAllByUser(User user){
-        return collectionRepository.findAllByUserId(user.getId());
-    }
-
     @Transactional
     public Collection save(Collection collection){
         collection.setLastUpdate(LocalDateTime.now());
