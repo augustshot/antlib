@@ -22,7 +22,6 @@
     box-shadow: var(--shadow-md);
 }
 
-/* Контейнер на всю ширину, но контент по центру */
 .navbar > .container {
     max-width: 1400px;
     width: 100%;
@@ -32,7 +31,7 @@
     padding-right: 2rem;
 }
 
-/* Логотип */
+
 .navbar-brand {
     font-weight: 800;
     font-size: 2rem;
@@ -50,7 +49,7 @@
     color: transparent !important;
 }
 
-/* Навигационные ссылки */
+
 .navbar-nav {
     gap: 0.3rem;
 }
@@ -88,7 +87,7 @@
     border-radius: 3px;
 }
 
-/* Кнопка аватара - без обводки */
+
 .btn-avatar {
     background: none !important;
     border: none !important;
@@ -116,7 +115,7 @@
     display: none !important;
 }
 
-/* Иконка аватара */
+
 .avatar-icon {
     width: 36px;
     height: 36px;
@@ -129,7 +128,7 @@
     color: var(--primary-green);
 }
 
-/* Выпадающее меню Bootstrap */
+
 .dropdown-menu {
     border: 1px solid var(--gray-border);
     border-radius: 16px;
@@ -158,35 +157,7 @@
     border-top-color: var(--gray-border);
 }
 
-/* Скрываем стрелку Bootstrap у кнопки с классом btn-avatar */
+
 .btn-avatar.dropdown-toggle::after {
     display: none !important;
-}
-
-/* Мобильная версия */
-@media (max-width: 992px) {
-    .navbar-nav {
-        gap: 0;
-        margin-top: 1rem;
-    }
-
-    .nav-link.active::after {
-        display: none;
-    }
-
-    .navbar > .container {
-        padding-left: 1rem;
-        padding-right: 1rem;
-    }
-}
-
-@media (max-width: 768px) {
-    .navbar-brand {
-        font-size: 1.6rem;
-    }
-
-    .avatar-icon {
-        width: 32px;
-        height: 32px;
-    }
 }

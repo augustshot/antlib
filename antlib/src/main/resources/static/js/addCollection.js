@@ -51,12 +51,10 @@ function init() {
         return true;
     }
 
-    // Валидация названия при вводе
     nameInput.addEventListener('input', function() {
         validateName();
     });
 
-    // Отправка по Enter в поле названия
     nameInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
             e.preventDefault();
@@ -64,7 +62,6 @@ function init() {
         }
     });
 
-    // Отправка по Enter в поле описания
     if (descriptionInput) {
         descriptionInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
@@ -74,7 +71,6 @@ function init() {
         });
     }
 
-    // Очистка формы при открытии модального окна
     if (modal) {
         modal.addEventListener('show.bs.modal', function() {
             nameInput.value = '';
@@ -83,7 +79,6 @@ function init() {
             if (descriptionInput) {
                 descriptionInput.classList.remove('is-valid', 'is-invalid');
             }
-            // Фокусируемся на поле названия
             setTimeout(() => nameInput.focus(), 100);
         });
     }

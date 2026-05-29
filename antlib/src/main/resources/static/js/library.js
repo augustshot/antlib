@@ -1,4 +1,3 @@
-// Глобальные переменные
 let isOwner = false;
 let libraryId = null;
 let currentRoomId = null;
@@ -14,8 +13,8 @@ const GRID_SLOTS_W = 10;
 const GRID_SLOTS_H = 10;
 
 const SHELF_UNIT_SIZE = 20;
-const DEFAULT_BOOKS_PER_UNIT = 10; // 10 книг на единицу ширины по умолчанию
-const MAX_BOOKS_PER_UNIT = 15;      // максимум 15 книг на единицу ширины
+const DEFAULT_BOOKS_PER_UNIT = 10; 
+const MAX_BOOKS_PER_UNIT = 15;     
 const MIN_BOOK_WIDTH = 8;
 const GAP_BETWEEN_BOOKS = 0.5;
 
@@ -23,13 +22,11 @@ const DEFAULT_ZOOM = 0.8;
 const MIN_ZOOM = 0.4;
 const MAX_ZOOM = 2.0;
 
-// Камера
 let camera = { x: 0, y: 0, scale: 1 };
 let isPanning = false;
 let panStartX = 0, panStartY = 0;
 let panCameraStartX = 0, panCameraStartY = 0;
 
-// Drag&Drop полок
 let isDraggingShelf = false;
 let draggedShelfId = null;
 let dragStartX = 0, dragStartY = 0;
@@ -44,7 +41,6 @@ function init() {
 
     if (!libraryId) return;
 
-    // Контейнер для уведомлений
     if (!document.getElementById('notificationContainer')) {
         const container = document.createElement('div');
         container.id = 'notificationContainer';
@@ -86,7 +82,6 @@ function init() {
     initModalEnterSubmit();
 }
 
-// --- УВЕДОМЛЕНИЯ ---
 function showNotification(message, type = 'success') {
     const container = document.getElementById('notificationContainer');
     if (!container) return;
@@ -113,7 +108,6 @@ function showNotification(message, type = 'success') {
     }, 3000);
 }
 
-// --- БАЗОВЫЕ ФУНКЦИИ ---
 function initBasicButtons() {
     const copyBtn = document.getElementById('copyCodeBtn');
     if (copyBtn) {
@@ -130,7 +124,6 @@ function initBasicButtons() {
 
 let userIdToRemove = null;
 function initMembersButtons() {
-    // Получаем экземпляр модалки участников (создаём один раз)
     const membersModalEl = document.getElementById('membersModal');
     if (membersModalEl) {
         membersModalInstance = new bootstrap.Modal(membersModalEl);
@@ -145,12 +138,10 @@ function initMembersButtons() {
             const username = this.dataset.username;
             document.getElementById('removeMemberName').textContent = username;
 
-            // Скрываем модалку участников
             if (membersModalInstance) {
                 membersModalInstance.hide();
             }
 
-            // Показываем модалку подтверждения
             const confirmModal = new bootstrap.Modal(document.getElementById('confirmRemoveMemberModal'));
             confirmModal.show();
         });
@@ -163,14 +154,11 @@ function initConfirmRemoveMember() {
 
     if (!confirmBtn) return;
 
-    // При закрытии модалки подтверждения (любым способом) - показываем модалку участников
     if (confirmModalElement) {
         confirmModalElement.addEventListener('hidden.bs.modal', function() {
-            // Показываем модалку участников снова
             if (membersModalInstance) {
                 membersModalInstance.show();
             }
-            // Сбрасываем userId
             userIdToRemove = null;
         });
     }
@@ -368,16 +356,13 @@ function initRegenerateCode() {
     });
 }
 
-// --- КОМНАТЫ ---
 function initRoomClickHandlers() {
     const items = document.querySelectorAll('.room-item');
 
-    // 1. Проверяем, есть ли вообще комнаты в списке
     if (!items.length) {
         const header = document.getElementById('roomNameHeader');
         if (header) header.textContent = "Выберите комнату";
 
-        // Скрываем кнопки управления, так как комнаты нет
         const viewBtn = document.getElementById('viewModeBtn');
         const editBtn = document.getElementById('editModeBtn');
         const zoomGroup = document.querySelector('.btn-group-sm.me-2');
@@ -392,10 +377,9 @@ function initRoomClickHandlers() {
         if (saveLayoutBtn) saveLayoutBtn.style.display = 'none';
         if (cancelLayoutBtn) cancelLayoutBtn.style.display = 'none';
 
-        return; // Прерываем выполнение, комнат нет
+        return;
     }
 
-    // 2. Если комнаты есть, вешаем обработчики кликов
     items.forEach(item => {
         item.addEventListener('click', function(e) {
             if (e.target.closest('.room-actions')) return;
@@ -409,7 +393,6 @@ function initRoomClickHandlers() {
         });
     });
 
-    // 3. Автоматически выбираем первую комнату
     const first = document.querySelector('.room-item');
     if (first) {
         const roomId = first.querySelector('.room-id')?.value;
@@ -430,7 +413,6 @@ async function loadRoom(roomId, roomName) {
         const result = await res.json();
         if (result.success) {
             shelvesData = result.shelves || [];
-            // Сброс флагов удаления при загрузке
             shelvesData.forEach(s => s.markedForDeletion = false);
 
             if (!isEditMode) {
@@ -459,7 +441,6 @@ function initRoomCanvas(roomId) {
     canvas.style.width = `${totalWidth}px`;
     canvas.style.height = `${totalHeight}px`;
 
-    // Сетка
     for (let y = 0; y < GRID_SLOTS_H; y++) {
         for (let x = 0; x < GRID_SLOTS_W; x++) {
             const slot = document.createElement('div');
@@ -503,7 +484,6 @@ function drawShelves() {
         div.style.gap = `${GAP_BETWEEN_BOOKS}px`;
 
         if (isEditMode && isOwner) {
-            // Режим редактирования - хендлы
             div.innerHTML = `
                 <div class="shelf-handle drag-handle">✥</div>
                         <div class="shelf-handle resize-handle">⣿</div>
@@ -534,19 +514,16 @@ function drawShelves() {
                 });
             }
         } else {
-            // Режим просмотра - книги
             const books = shelf.books || [];
             const capacity = shelf.capacity;
             const availableWidth = widthPx - 8;
             const gap = GAP_BETWEEN_BOOKS;
 
-            // Отображаем книги в количестве не больше вместимости
             const displayBooks = books.slice(0, capacity);
             const bookCount = displayBooks.length;
 
-            // Рассчитываем ширину книги
-            const MAX_BOOK_WIDTH_FRACTION = 10; // 1/10 ширины слота
-            const maxBookWidth = SLOT_SIZE_PX / MAX_BOOK_WIDTH_FRACTION; // 250 / 10 = 25px
+            const MAX_BOOK_WIDTH_FRACTION = 10; 
+            const maxBookWidth = SLOT_SIZE_PX / MAX_BOOK_WIDTH_FRACTION; 
             let bookWidth = MIN_BOOK_WIDTH;
             if (bookCount > 0) {
                 const totalGapWidth = (bookCount - 1) * gap;
@@ -556,14 +533,13 @@ function drawShelves() {
 
             const bookHeight = SLOT_SIZE_PX - 8;
 
-            // Отрисовка книг
             displayBooks.forEach((book) => {
                 const bookDiv = document.createElement('div');
                 bookDiv.className = 'book-on-shelf';
                 bookDiv.style.width = `${bookWidth}px`;
                 bookDiv.style.height = `${bookHeight}px`;
                 bookDiv.title = `${book.title}\n${book.author || ''}`;
-                bookDiv.dataset.shelfBookId = book.shelfBookId;  // ← ДОБАВИТЬ ЭТУ СТРОКУ
+                bookDiv.dataset.shelfBookId = book.shelfBookId;  
                 bookDiv.addEventListener('click', (e) => {
                     e.stopPropagation();
                     showBookPopup(book, e.clientX, e.clientY);
@@ -571,7 +547,6 @@ function drawShelves() {
                 div.appendChild(bookDiv);
             });
 
-            // Пустая полка - показываем кнопку добавления
             if (books.length === 0 && isOwner) {
                 const emptyDiv = document.createElement('div');
                 emptyDiv.className = 'empty-shelf';
@@ -586,7 +561,6 @@ function drawShelves() {
                 div.appendChild(emptyDiv);
             }
 
-            // Карандашик для управления книгами
             if (isOwner) {
                 const editHandle = document.createElement('div');
                 editHandle.className = 'shelf-handle edit-books-handle';
@@ -614,21 +588,18 @@ function markShelfForDeletion(shelfId) {
     }
 }
 
-// --- РЕЖИМЫ И СОХРАНЕНИЕ ---
 function initViewModes() {
     const viewBtn = document.getElementById('viewModeBtn');
     const editBtn = document.getElementById('editModeBtn');
     const addShelfBtn = document.getElementById('openAddShelfModalBtn');
     const saveLayoutBtn = document.getElementById('saveLayoutBtn');
 
-    // Создаем кнопку отмены динамически, если её нет в HTML
     let cancelLayoutBtn = document.getElementById('cancelLayoutBtn');
     if (!cancelLayoutBtn && isOwner) {
         cancelLayoutBtn = document.createElement('button');
         cancelLayoutBtn.id = 'cancelLayoutBtn';
         cancelLayoutBtn.className = 'btn btn-sm btn-outline-secondary d-none me-2';
         cancelLayoutBtn.innerHTML = 'Отмена';
-        // Вставляем перед кнопкой сохранения
         if (saveLayoutBtn) saveLayoutBtn.parentNode.insertBefore(cancelLayoutBtn, saveLayoutBtn);
     }
 
@@ -656,7 +627,6 @@ function initViewModes() {
         }
 
         if (!edit && currentRoomId) {
-             // При выходе в просмотр перезагружаем данные, чтобы сбросить несохраненные изменения
              loadRoom(currentRoomId, document.getElementById('roomNameHeader')?.innerText);
         } else {
              drawShelves();
@@ -666,15 +636,13 @@ function initViewModes() {
     if (viewBtn) viewBtn.addEventListener('click', () => setMode(false));
     if (editBtn) editBtn.addEventListener('click', () => setMode(true));
 
-    // Кнопка Отмена
     if (cancelLayoutBtn) {
         cancelLayoutBtn.addEventListener('click', () => {
-            setMode(false); // Переключит в просмотр и перезагрузит данные
-                            showNotification('Изменения отменены', 'warning');
+            setMode(false); 
+            showNotification('Изменения отменены', 'warning');
         });
     }
 
-    // Кнопка Сохранить
     if (saveLayoutBtn) {
         saveLayoutBtn.addEventListener('click', async () => {
             saveLayoutBtn.disabled = true;
@@ -705,7 +673,6 @@ function initViewModes() {
 
                 showNotification('Расстановка сохранена');
 
-                // Удаляем помеченные из локального массива
                 shelvesData = shelvesData.filter(s => !s.markedForDeletion);
 
                 saveLayoutBtn.innerHTML = 'Сохранено!';
@@ -735,14 +702,11 @@ function markShelfForDeletion(shelfId) {
     }
 }
 
-// --- ДОБАВЛЕНИЕ И ИЗМЕНЕНИЕ РАЗМЕРА ---
-// Функция добавления полки с проверкой вместимости
 function addShelf(width, height, capacity) {
     const widthSlots = Math.ceil(width / SHELF_UNIT_SIZE);
     const heightSlots = Math.ceil(height / SHELF_UNIT_SIZE);
     const maxCapacity = (width / SHELF_UNIT_SIZE) * MAX_BOOKS_PER_UNIT;
 
-    // Проверка вместимости
     if (capacity > maxCapacity) {
         showNotification(`Вместимость не может превышать ${maxCapacity} книг (максимум 15 на клетку ширины)`, 'error');
         return false;
@@ -786,7 +750,6 @@ function addShelf(width, height, capacity) {
     return false;
 }
 
-// Функция изменения размера полки с проверкой вместимости
 function resizeShelf(id, newWidth, newHeight, newCapacity) {
     const shelf = shelvesData.find(s => s.id === id);
     if (!shelf) return;
@@ -795,7 +758,6 @@ function resizeShelf(id, newWidth, newHeight, newCapacity) {
     const newHeightSlots = Math.ceil(newHeight / SHELF_UNIT_SIZE);
     const maxCapacity = (newWidth / SHELF_UNIT_SIZE) * MAX_BOOKS_PER_UNIT;
 
-    // Проверка вместимости
     if (newCapacity > maxCapacity) {
         showNotification(`Вместимость не может превышать ${maxCapacity} книг (максимум 15 на клетку ширины)`, 'error');
         return;
@@ -839,19 +801,14 @@ function resizeShelf(id, newWidth, newHeight, newCapacity) {
     }
 }
 
-// --- DRAG AND DROP & PAN ---
-// Перетаскивание полок и панорамирование
 function initDragAndDrop() {
     const viewport = document.getElementById('roomViewport');
 
-    // Обработчик начала перетаскивания (решаем что тащим)
     const onMouseDown = (e) => {
-        // Проверяем, не кликнули ли по хендлу полки
         const isDragHandle = e.target.closest('.drag-handle');
         const isShelf = e.target.closest('.shelf');
 
         if (isDragHandle && isEditMode && isOwner) {
-            // Начинаем перетаскивание полки
             e.preventDefault();
             const shelfEl = e.target.closest('.shelf');
             if (shelfEl) {
@@ -864,10 +821,8 @@ function initDragAndDrop() {
                 }
             }
         } else if (isShelf && isEditMode && isOwner) {
-            // Ничего не делаем, чтобы не мешать кликам по другим элементам
             return;
         } else {
-            // Иначе начинаем панорамирование поля
             isPanning = true;
             panStartX = e.clientX;
             panStartY = e.clientY;
@@ -877,9 +832,7 @@ function initDragAndDrop() {
         }
     };
 
-    // Обработчик движения мыши
     const onMouseMove = (e) => {
-        // Если тащим полку
         if (isDraggingShelf && draggedShelfId !== null && isEditMode && isOwner) {
             const shelf = shelvesData.find(s => s.id === draggedShelfId);
             if (!shelf) return;
@@ -895,7 +848,6 @@ function initDragAndDrop() {
             newX = Math.min(Math.max(0, newX), GRID_SLOTS_W - dragOriginalWidthSlots);
             newY = Math.min(Math.max(0, newY), GRID_SLOTS_H - dragOriginalHeightSlots);
 
-            // Проверка коллизий
             let hasCollision = false;
             for (const other of shelvesData) {
                 if (other.id === draggedShelfId) continue;
@@ -921,7 +873,6 @@ function initDragAndDrop() {
             return;
         }
 
-        // Если панорамируем поле
         if (isPanning) {
             camera.x = panCameraStartX + (e.clientX - panStartX);
             camera.y = panCameraStartY + (e.clientY - panStartY);
@@ -929,9 +880,7 @@ function initDragAndDrop() {
         }
     };
 
-    // Обработчик окончания перетаскивания
     const onMouseUp = () => {
-        // Сохраняем позицию полки
         if (isDraggingShelf && draggedShelfId !== null && isEditMode && isOwner) {
             const shelf = shelvesData.find(s => s.id === draggedShelfId);
             const shelfEl = document.querySelector(`.shelf[data-id="${draggedShelfId}"]`);
@@ -950,12 +899,10 @@ function initDragAndDrop() {
         isDraggingShelf = false;
         draggedShelfId = null;
 
-        // Завершаем панорамирование
         isPanning = false;
         if (viewport) viewport.style.cursor = 'grab';
     };
 
-    // Регистрируем обработчики
     if (viewport) {
         viewport.addEventListener('mousedown', onMouseDown);
         window.addEventListener('mousemove', onMouseMove);
@@ -988,7 +935,6 @@ function startDrag(e, id, widthSlots, heightSlots) {
     }
 }
 
-// --- ЗУМ И ПАНОРАМИРОВАНИЕ (Инициализация) ---
 
 function initZoomAndPan() {
     const viewport = document.getElementById('roomViewport');
@@ -1052,13 +998,13 @@ function initAddShelfModal() {
     const confirmBtn = document.getElementById('confirmAddShelfBtn');
     const widthInput = document.getElementById('shelfWidth');
     const heightInput = document.getElementById('shelfHeight');
-    const capacitySpan = document.getElementById('shelfCapacity');  // span для отображения
+    const capacitySpan = document.getElementById('shelfCapacity');  
 
     if (!openBtn || !confirmBtn) return;
 
     function updateCapacity() {
         const width = parseInt(widthInput.value) || 1;
-        const maxCapacity = width * MAX_BOOKS_PER_UNIT;  // MAX_BOOKS_PER_UNIT = 15
+        const maxCapacity = width * MAX_BOOKS_PER_UNIT;  
 
         if (capacitySpan) {
             capacitySpan.textContent = maxCapacity;
@@ -1088,7 +1034,6 @@ function initAddShelfModal() {
 
         const width = wBlocks * SHELF_UNIT_SIZE;
         const height = hBlocks * SHELF_UNIT_SIZE;
-        // Берём capacity из span (как число)
         let capacity = parseInt(capacitySpan.textContent);
         if (isNaN(capacity) || capacity < 1) {
             capacity = wBlocks * MAX_BOOKS_PER_UNIT;
@@ -1180,7 +1125,6 @@ async function loadShelfBooks(shelfId) {
 
         if (!result.success) return;
 
-        // Находим полку в shelvesData
         const shelf = shelvesData.find(s => s.id === shelfId);
         const books = result.books || [];
         const currentCount = books.length;
@@ -1192,7 +1136,6 @@ async function loadShelfBooks(shelfId) {
                     addBooksBtn.title = availableSpace <= 0 ? 'Нет свободного места на полке' : 'Добавить книги';
                 }
 
-        // Обновляем информацию в спане
         if (shelfInfoSpan) {
             shelfInfoSpan.innerHTML = `
                 <div class="d-flex justify-content-between mb-2">
@@ -1240,14 +1183,11 @@ async function loadShelfBooks(shelfId) {
 
                             showNotification('Книги удалены', 'success');
 
-                            // Закрываем модалку
                             const modal = bootstrap.Modal.getInstance(document.getElementById('editShelfBooksModal'));
                             if (modal) modal.hide();
 
-                            // Обновляем комнату
                             await loadRoom(currentRoomId, document.getElementById('roomNameHeader')?.innerText);
 
-                            // Открываем модалку заново с обновлёнными данными
                             setTimeout(() => {
                                 loadShelfBooks(currentShelfId);
                             }, 300);
@@ -1332,11 +1272,9 @@ function initShelvesModals() {
                  if (result.success) {
                      showNotification(result.message || 'Книги добавлены', 'success');
 
-                     // Закрываем оба модальных окна в правильном порядке
                      const addBooksModal = bootstrap.Modal.getInstance(document.getElementById('addBooksToShelfModal'));
                      if (addBooksModal) addBooksModal.hide();
 
-                     // Ждём закрытия первого модального окна, затем обновляем данные и переоткрываем окно полки
                      setTimeout(() => {
                          loadShelfBooks(currentShelfId);
                          loadRoom(currentRoomId, document.getElementById('roomNameHeader')?.innerText);
@@ -1495,16 +1433,14 @@ function debounce(fn, delay) {
     };
 }
 
-// --- РАСЧЁТ ШИРИНЫ КНИГИ ---
 function calculateBookWidth(shelfWidthPx, bookCount, gap, minWidth) {
     if (bookCount === 0) return minWidth;
-    const availableWidth = shelfWidthPx - 8; // вычитаем padding 4px слева и справа
+    const availableWidth = shelfWidthPx - 8; 
     const totalGapWidth = (bookCount - 1) * gap;
     const calculatedWidth = (availableWidth - totalGapWidth) / bookCount;
     return Math.max(minWidth, Math.floor(calculatedWidth));
 }
 
-// Инициализация поиска
 function initSearch() {
     const searchBtn = document.getElementById('searchBookBtn');
     const searchInput = document.getElementById('searchBookInput');
@@ -1523,7 +1459,6 @@ function initSearch() {
     }
 }
 
-// Выполнение поиска
 async function performSearch() {
     const searchTerm = document.getElementById('searchBookInput')?.value.trim();
     if (!searchTerm) {
@@ -1531,13 +1466,13 @@ async function performSearch() {
         return;
     }
 
-//    const resultsDiv = document.getElementById('searchResults');
-//    const resultsMessage = document.getElementById('searchResultsMessage');
-//    const foundBooksList = document.getElementById('foundBooksList');
+    const resultsDiv = document.getElementById('searchResults');
+    const resultsMessage = document.getElementById('searchResultsMessage');
+    const foundBooksList = document.getElementById('foundBooksList');
     const clearBtn = document.getElementById('clearSearchBtn');
 
-//    resultsDiv.style.display = 'block';
-//    foundBooksList.innerHTML = '';
+    resultsDiv.style.display = 'block';
+    foundBooksList.innerHTML = '';
 
     try {
         const response = await fetch(`/libraries/${libraryId}/books/search?query=${encodeURIComponent(searchTerm)}`);
@@ -1548,38 +1483,38 @@ async function performSearch() {
             isSearchActive = true;
 
             const roomsFound = [...new Set(result.books.map(b => b.roomName))];
-//            resultsMessage.innerHTML = `
-//                Найдено книг: ${result.books.length}<br>
-//                <small>В комнатах: ${roomsFound.join(', ')}</small>
-//            `;
+            resultsMessage.innerHTML = `
+                Найдено книг: ${result.books.length}<br>
+                <small>В комнатах: ${roomsFound.join(', ')}</small>
+            `;
 
             clearBtn.style.display = 'block';
 
-            // Подсвечиваем найденные книги (убираем старую подсветку и ставим новую)
             clearHighlights();
             highlightFoundBooks(currentSearchResults);
 
 //            showNotification(`Найдено ${result.books.length} книг в ${roomsFound.length} комнатах`, 'info');
 
         } else {
-//            resultsMessage.innerHTML = 'Ничего не найдено';
-//            foundBooksList.innerHTML = '';
-//            clearSearch();
+            resultsMessage.innerHTML = 'Ничего не найдено';
+            foundBooksList.innerHTML = '';
+            clearHighlights();
+            currentSearchResults = [];
+            isSearchActive = false;
+            clearBtn.style.display = 'none';
         }
 
     } catch (error) {
         console.error('Search error:', error);
-//        resultsMessage.innerHTML = 'Ошибка поиска';
+        resultsMessage.innerHTML = 'Ошибка поиска';
         showNotification('Ошибка при поиске', 'error');
     }
 }
 
-// Подсветка найденных книг на полках
 function highlightFoundBooks(books) {
 
     if (!books || books.length === 0) return;
 
-    // Подсвечиваем КАЖДУЮ полку для КАЖДОЙ найденной книги
     books.forEach(book => {
 
 
@@ -1607,7 +1542,6 @@ function highlightFoundBooks(books) {
     });
 }
 
-// Снятие подсветки
 function clearHighlights() {
     document.querySelectorAll('.shelf.highlight-shelf').forEach(el => {
         el.classList.remove('highlight-shelf');
@@ -1617,26 +1551,24 @@ function clearHighlights() {
         });
 }
 
-// Очистка поиска
 function clearSearch() {
-//    const resultsDiv = document.getElementById('searchResults');
+    const resultsDiv = document.getElementById('searchResults');
     const searchInput = document.getElementById('searchBookInput');
     const clearBtn = document.getElementById('clearSearchBtn');
 
-//    resultsDiv.style.display = 'none';
-//    document.getElementById('searchResultsMessage').innerHTML = '';
-//    document.getElementById('foundBooksList').innerHTML = '';
+    resultsDiv.style.display = 'none';
+    document.getElementById('searchResultsMessage').innerHTML = '';
+    document.getElementById('foundBooksList').innerHTML = '';
     clearBtn.style.display = 'none';
 
     currentSearchResults = [];
     isSearchActive = false;
-    clearHighlights();  // Убираем подсветку при очистке
+    clearHighlights();  
 
     if (searchInput) searchInput.value = '';
 }
 
 function initModalEnterSubmit() {
-    // Находим все модалки
     const modals = document.querySelectorAll('.modal');
 
     modals.forEach(modal => {
@@ -1645,11 +1577,9 @@ function initModalEnterSubmit() {
                 e.preventDefault();
                 e.stopPropagation();
 
-                // Ищем активную кнопку подтверждения в этой модалке
                 const confirmBtn = modal.querySelector('.btn-success:not(.btn-outline-success):not([disabled]), .btn-primary:not([disabled])');
                 const deleteBtn = modal.querySelector('.btn-danger:not([disabled])');
 
-                // Приоритет: сначала success/primary, потом danger
                 const btnToClick = confirmBtn || deleteBtn;
 
                 if (btnToClick && !btnToClick.disabled) {

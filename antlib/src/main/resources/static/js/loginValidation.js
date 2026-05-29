@@ -54,17 +54,14 @@ function init() {
     function submitForm() {
         let isValid = true;
 
-        // Скрываем общую ошибку при повторной отправке
         if (loginError) {
             loginError.classList.add('d-none');
         }
 
-        // Проверка username
         if (!validateField(usernameInput, usernameError, 'имя пользователя')) {
             isValid = false;
         }
 
-        // Проверка пароля
         if (!validateField(passwordInput, passwordError, 'пароль')) {
             isValid = false;
         }
@@ -76,11 +73,9 @@ function init() {
         return isValid;
     }
 
-    // Обработчики событий
     if (usernameInput) {
         usernameInput.addEventListener('input', function() {
             validateField(usernameInput, usernameError, 'имя пользователя');
-            // Скрываем общую ошибку при вводе
             if (loginError) {
                 loginError.classList.add('d-none');
             }
@@ -90,7 +85,6 @@ function init() {
     if (passwordInput) {
         passwordInput.addEventListener('input', function() {
             validateField(passwordInput, passwordError, 'пароль');
-            // Скрываем общую ошибку при вводе
             if (loginError) {
                 loginError.classList.add('d-none');
             }

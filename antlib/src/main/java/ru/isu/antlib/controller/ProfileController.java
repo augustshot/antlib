@@ -10,17 +10,20 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import ru.isu.antlib.model.Source;
 import ru.isu.antlib.model.Status;
 import ru.isu.antlib.model.User;
 import ru.isu.antlib.model.UserBookMark;
 import ru.isu.antlib.repository.UserRepository;
-import ru.isu.antlib.service.report.ExcelBooksReport;
-import ru.isu.antlib.service.report.ExcelStatsReport;
 import ru.isu.antlib.service.UserBookMarkService;
 import ru.isu.antlib.service.UserService;
+import ru.isu.antlib.service.report.ExcelBooksReport;
+import ru.isu.antlib.service.report.ExcelStatsReport;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -150,7 +153,6 @@ public class ProfileController {
 //        5) средний рейтинг
         view.addObject("rating", userBookMarkService.getAverageRating(userId));
 //        6) топ-5 книг по рейтингу
-
 //        7) топ-5 авторов
 
         view.addObject("username", user.getUsername());

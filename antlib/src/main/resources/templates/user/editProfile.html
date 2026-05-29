@@ -30,9 +30,7 @@
                     <h2 class="text-success mb-0">Редактировать профиль</h2>
                 </div>
 
-                <!-- Форма -->
                 <form id="profile-form" th:action="@{/profile/edit}" method="post">
-                    <!-- Секция: Основная информация -->
                     <div class="form-section">
                         <h5 class="form-section-title">
                             Основная информация
@@ -53,7 +51,6 @@
                         </div>
                     </div>
 
-                    <!-- Секция: Смена пароля -->
                     <div class="form-section">
                         <h5 class="form-section-title">
                             Смена пароля
@@ -75,7 +72,6 @@
                         </div>
                     </div>
 
-                    <!-- Кнопки -->
                     <div class="form-section">
                         <div class="d-flex justify-content-between gap-3">
                             <a th:href="@{/profile}" class="btn btn-outline-secondary px-4">

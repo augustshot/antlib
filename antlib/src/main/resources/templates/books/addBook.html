@@ -171,16 +171,13 @@
 
                     <small class="text-danger" id="searchErrorText" style="display: none;"></small>
 
-                    <!-- Результаты поиска -->
                     <div id="searchResults" style="display: none;">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h6 class="text-success mb-0">Результаты поиска</h6>
                             <span id="resultCount">0 книг найдено</span>
                         </div>
                         <div id="searchResultsGrid" class="row row-cols-1 g-3">
-                            <!-- Карточки будут здесь -->
                         </div>
-                        <!-- Пагинация -->
                         <div id="searchPagination" class="d-flex justify-content-center mt-4"></div>
                     </div>
                     <div id="searchLoading" class="text-center py-5" style="display: none;">
@@ -197,7 +194,6 @@
     </div>
 
 
-    <!-- Одна форма с th:object UserBook -->
     <form th:action="@{/books/save}" th:object="${userBook}" th:method="post">
 
         <!-- Секция: Основная информация (BookDescription) -->
@@ -307,7 +303,6 @@
             </div>
         </div>
 
-        <!-- Кнопки -->
         <div class="d-flex justify-content-end gap-3 mt-4 mb-5">
             <a th:href="@{/books}" class="btn btn-outline-secondary px-4" id="cancelBtn">Отмена</a>
             <button type="submit" class="btn btn-success px-4">Добавить</button>

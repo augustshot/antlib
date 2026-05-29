@@ -4,14 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.isu.antlib.dto.UserBookDto;
 import ru.isu.antlib.model.*;
-import ru.isu.antlib.repository.BookDescriptionRepository;
 import ru.isu.antlib.repository.UserBookMarkRepository;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -64,8 +60,8 @@ public class UserBookMarkService {
         return userBookMarkRepository.findDistinctByUserIdAndSearch(user.getId(), search);
     }
 
-    // статистика
 
+    // статистика
     public int[] getStatusStats(Integer userId){
         int[] stats = new int[5];
         stats[0] = userBookMarkRepository.countByUserIdAndStatus(userId, Status.PLANNED);

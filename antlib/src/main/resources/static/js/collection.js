@@ -22,7 +22,6 @@ function initEditCollection() {
 
     if (!saveBtn) return;
 
-    // Очистка ошибки при вводе
     nameInput.addEventListener('input', function() {
         errorDiv.classList.add('d-none');
         errorDiv.textContent = '';
@@ -32,7 +31,6 @@ function initEditCollection() {
     saveBtn.addEventListener('click', async function() {
         const name = nameInput.value.trim();
 
-        // Очищаем предыдущие ошибки
         errorDiv.classList.add('d-none');
         errorDiv.textContent = '';
         nameInput.classList.remove('is-invalid');
@@ -60,10 +58,8 @@ function initEditCollection() {
             const result = await response.json();
 
             if (result.success) {
-                // Успех - перезагружаем страницу
                 window.location.reload();
             } else {
-                // Показываем ошибку в модалке
                 nameInput.classList.add('is-invalid');
                 errorDiv.classList.remove('d-none');
                 errorDiv.textContent = result.message || 'Ошибка при обновлении коллекции';
@@ -99,12 +95,10 @@ function initDeleteCollection() {
             const result = await response.json();
 
             if (result.success) {
-                // Закрываем модалку и переходим к списку
                 const modal = bootstrap.Modal.getInstance(modalElement);
                 if (modal) modal.hide();
                 window.location.href = '/collections';
             } else {
-                // Показываем ошибку (можно добавить span для ошибки в модалке удаления)
                 const errorDiv = document.getElementById('delete-collection-error');
                 if (errorDiv) {
                     errorDiv.classList.remove('d-none');
@@ -134,13 +128,11 @@ function initAddBooksToCollection() {
 
     if (!modal) return;
 
-    // Очищаем ошибки и выделения при открытии модалки
     modal.addEventListener('show.bs.modal', function() {
         if (errorDiv) {
             errorDiv.classList.add('d-none');
             errorDiv.textContent = '';
         }
-        // Снимаем выделение со всех чекбоксов
         document.querySelectorAll('.add-book-to-collection-checkbox').forEach(cb => {
             cb.checked = false;
         });
@@ -159,7 +151,6 @@ function initAddBooksToCollection() {
             const selected = Array.from(document.querySelectorAll('.add-book-to-collection-checkbox:checked'))
                 .map(cb => cb.value);
 
-            // Очищаем предыдущие ошибки
             if (errorDiv) {
                 errorDiv.classList.add('d-none');
                 errorDiv.textContent = '';
@@ -252,10 +243,8 @@ function initRemoveBookFromCollection() {
     const modalElement = document.getElementById('confirmRemoveBookModal');
     const errorDiv = document.getElementById('remove-book-error');
 
-    // Обработчики для кнопок удаления (обновляются при перезагрузке таблицы)
     attachRemoveBookHandlers();
 
-    // Наблюдатель за изменением DOM (для динамически добавленных кнопок)
     const observer = new MutationObserver(function() {
         attachRemoveBookHandlers();
     });
@@ -265,7 +254,6 @@ function initRemoveBookFromCollection() {
         confirmBtn.addEventListener('click', async function() {
             if (!bookToRemove) return;
 
-            // Очищаем ошибку
             if (errorDiv) {
                 errorDiv.classList.add('d-none');
                 errorDiv.textContent = '';
@@ -308,7 +296,6 @@ function initRemoveBookFromCollection() {
 
 function attachRemoveBookHandlers() {
     document.querySelectorAll('.remove-from-collection-btn').forEach(btn => {
-        // Удаляем старый обработчик, чтобы не было дублирования
         btn.removeEventListener('click', handleRemoveClick);
         btn.addEventListener('click', handleRemoveClick);
     });
@@ -319,7 +306,6 @@ function handleRemoveClick(e) {
     bookToRemove = this.dataset.bookId;
     document.getElementById('removeBookTitle').textContent = this.dataset.bookTitle;
 
-    // Очищаем ошибку при открытии
     const errorDiv = document.getElementById('remove-book-error');
     if (errorDiv) {
         errorDiv.classList.add('d-none');
@@ -351,11 +337,9 @@ function initModalEnterSubmit() {
                 e.preventDefault();
                 e.stopPropagation();
 
-                // Ищем активную кнопку подтверждения в этой модалке
                 const confirmBtn = modal.querySelector('.btn-success:not(.btn-outline-success):not([disabled]), .btn-primary:not([disabled])');
                 const deleteBtn = modal.querySelector('.btn-danger:not([disabled])');
 
-                // Приоритет: сначала success/primary, потом danger
                 const btnToClick = confirmBtn || deleteBtn;
 
                 if (btnToClick && !btnToClick.disabled) {

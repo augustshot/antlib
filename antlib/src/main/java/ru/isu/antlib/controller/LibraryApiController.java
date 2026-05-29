@@ -6,8 +6,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.isu.antlib.model.*;
-import ru.isu.antlib.repository.LibraryRepository;
-import ru.isu.antlib.repository.UserRepository;
 import ru.isu.antlib.service.*;
 
 import java.util.*;
@@ -48,10 +46,9 @@ public class LibraryApiController {
                 return response;
             }
 
-            // Проверка на владельца
             if (!userLibraryService.getOwner(library).getId().equals(currentUser.getId())) {
                 response.put("success", false);
-                response.put("message", "Только владелец может редактировать библиотеку");
+                response.put("message", "У вас нет прав на редактирование библиотеки");
                 return response;
             }
 
@@ -85,7 +82,7 @@ public class LibraryApiController {
             boolean isOwner = userLibraryService.getOwner(library).equals(user);
             if (!isOwner) {
                 response.put("success", false);
-                response.put("message", "У вас нет прав для удаления библиотеки");
+                response.put("message", "У вас нет прав на удаление библиотеки");
                 return response;
             }
 
@@ -96,7 +93,7 @@ public class LibraryApiController {
 
         } catch (Exception e) {
             response.put("success", false);
-            response.put("message", "Ошибка при удалении: " + e.getMessage());
+            response.put("message", "Ошибка при удалении библиотеки");
         }
 
         return response;
@@ -302,7 +299,6 @@ public class LibraryApiController {
             }
             Room room = roomOpt.get();
 
-            // Получаем все полки комнаты
             List<Shelf> shelves = shelfService.getShelvesByRoomId(roomId);
 
             List<Map<String, Object>> shelvesData = new ArrayList<>();
@@ -387,7 +383,6 @@ public Map<String, Object> deleteRoom(@PathVariable Integer libraryId,
         Map<String, Object> response = new HashMap<>();
 
         try {
-            // Проверяем доступ пользователя к библиотеке
             User user = userService.getByUsername(auth.getUsername());
 
             Library library = libraryService.getById(libraryId);
@@ -405,7 +400,6 @@ public Map<String, Object> deleteRoom(@PathVariable Integer libraryId,
                 return response;
             }
 
-            // Получаем полку
             Optional<Shelf> shelfOpt = shelfService.getById(shelfId);
             if (shelfOpt.isEmpty()) {
                 response.put("success", false);
@@ -413,13 +407,11 @@ public Map<String, Object> deleteRoom(@PathVariable Integer libraryId,
                 return response;
             }
 
-            // Получаем все ShelfBook для этой полки
             List<ShelfBook> shelfBooks = shelfBookService.getByShelfId(shelfId);
 
             List<Map<String, Object>> booksData = new ArrayList<>();
             for (ShelfBook shelfBook : shelfBooks) {
                     BookDescription book = shelfBook.getBookDescription();
-                    // Находим UserBookMark для этого пользователя и книги
                     UserBookMark userBookMark = userBookMarkService.getByUserAndBookDescription(user, book);
 
                     Map<String, Object> bookMap = new HashMap<>();
@@ -456,7 +448,6 @@ public Map<String, Object> deleteRoom(@PathVariable Integer libraryId,
             String newName = request.get("name");
 
 
-            // Получаем библиотеку
             Library library = libraryService.getById(libraryId);
             if (library == null) {
                 response.put("success", false);
@@ -464,7 +455,6 @@ public Map<String, Object> deleteRoom(@PathVariable Integer libraryId,
                 return response;
             }
 
-            // Получаем комнату
             Optional<Room> roomOpt = roomService.getById(roomId);
             if (roomOpt.isEmpty()) {
                 response.put("success", false);
@@ -474,7 +464,6 @@ public Map<String, Object> deleteRoom(@PathVariable Integer libraryId,
 
             Room room = roomOpt.get();
 
-            // Проверяем, что комната принадлежит библиотеке
             if (!room.getLibrary().getId().equals(libraryId)) {
                 response.put("success", false);
                 response.put("message", "Комната не принадлежит этой библиотеке");
@@ -484,7 +473,6 @@ public Map<String, Object> deleteRoom(@PathVariable Integer libraryId,
             if(!newName.equals(room.getName())){
                 room.setName(newName);
 
-                // Проверяем, не существует ли уже комната с таким названием (исключая текущую)
                 boolean exists = roomService.exists(room);
                 if (exists) {
                     response.put("success", false);
@@ -517,10 +505,8 @@ public Map<String, Object> deleteRoom(@PathVariable Integer libraryId,
         Map<String, Object> response = new HashMap<>();
 
         try {
-            // Получаем текущего пользователя
             User user = userService.getByUsername(auth.getUsername());
 
-            // Проверяем доступ к библиотеке
             Library library = libraryService.getById(libraryId);
             if (library == null) {
                 response.put("success", false);
@@ -528,14 +514,12 @@ public Map<String, Object> deleteRoom(@PathVariable Integer libraryId,
                 return response;
             }
 
-            // Только владелец может сохранять расстановку
             if (!userLibraryService.getOwner(library).getId().equals(user.getId())) {
                 response.put("success", false);
                 response.put("message", "Только владелец библиотеки может изменять расстановку");
                 return response;
             }
 
-            // Проверяем, что комната существует и принадлежит библиотеке
             Optional<Room> roomOpt = roomService.getById(roomId);
             if (roomOpt.isEmpty() || !roomOpt.get().getLibrary().getId().equals(libraryId)) {
                 response.put("success", false);
@@ -543,18 +527,15 @@ public Map<String, Object> deleteRoom(@PathVariable Integer libraryId,
                 return response;
             }
 
-            // Получаем данные из запроса
             List<Map<String, Object>> shelvesData = (List<Map<String, Object>>) request.get("shelves");
             List<Integer> deletedIds = (List<Integer>) request.get("deletedIds");
 
-            // Удаляем помеченные полки
             if (deletedIds != null && !deletedIds.isEmpty()) {
                 for (Integer id : deletedIds) {
                     shelfService.deleteById(id);
                 }
             }
 
-            // Сохраняем или обновляем полки
             if (shelvesData != null) {
                 for (Map<String, Object> shelfData : shelvesData) {
                     Integer id = (Integer) shelfData.get("id");
@@ -566,7 +547,6 @@ public Map<String, Object> deleteRoom(@PathVariable Integer libraryId,
 
                     Shelf shelf;
                     if (id != null && id > 0) {
-                        // Обновление существующей полки
                         shelf = shelfService.getById(id)
                                 .orElseThrow(() -> new RuntimeException("Полка не найдена: " + id));
                         shelf.setWidth(width);
@@ -575,7 +555,6 @@ public Map<String, Object> deleteRoom(@PathVariable Integer libraryId,
                         shelf.setPositionY(positionY);
                         shelf.setCapacity(capacity);
                     } else {
-                        // Создание новой полки
                         shelf = new Shelf();
                         shelf.setRoom(roomOpt.get());
                         shelf.setWidth(width);
@@ -609,7 +588,6 @@ public Map<String, Object> deleteRoom(@PathVariable Integer libraryId,
         try {
             User user = userService.getByUsername(auth.getUsername());
 
-            // Проверяем доступ к библиотеке
             Library library = libraryService.getById(libraryId);
             if (library == null) {
                 response.put("success", false);
@@ -617,7 +595,6 @@ public Map<String, Object> deleteRoom(@PathVariable Integer libraryId,
                 return response;
             }
 
-            // Проверяем, является ли пользователь участником библиотеки
             boolean isMember = userLibraryService.isMember(user, library);
             if (!isMember && !userLibraryService.getOwner(library).getId().equals(user.getId())) {
                 response.put("success", false);
@@ -625,7 +602,6 @@ public Map<String, Object> deleteRoom(@PathVariable Integer libraryId,
                 return response;
             }
 
-            // Поиск книг пользователя со статусом OWNED
             List<UserBookMark> userBooks;
             if (search != null && !search.trim().isEmpty()) {
                 String searchTerm = "%" + search.trim().toLowerCase() + "%";
@@ -636,7 +612,6 @@ public Map<String, Object> deleteRoom(@PathVariable Integer libraryId,
             }
 
 
-            // Формируем ответ
             List<Map<String, Object>> booksData = new ArrayList<>();
             for (UserBookMark ubm : userBooks) {
                 BookDescription book = ubm.getBookDescription();
@@ -672,7 +647,6 @@ public Map<String, Object> deleteRoom(@PathVariable Integer libraryId,
         try {
             User user = userService.getByUsername(auth.getUsername());
 
-            // Проверка доступа к библиотеке
             Library library = libraryService.getById(libraryId);
             if (library == null) {
                 response.put("success", false);
@@ -687,7 +661,6 @@ public Map<String, Object> deleteRoom(@PathVariable Integer libraryId,
                 return response;
             }
 
-            // Проверка существования полки
             Shelf shelf = shelfService.getById(shelfId)
                     .orElseThrow(() -> new RuntimeException("Полка не найдена"));
 
@@ -714,8 +687,7 @@ public Map<String, Object> deleteRoom(@PathVariable Integer libraryId,
 
             if (bookMarkIds.size() > availableSpace) {
                 response.put("success", false);
-                response.put("message", String.format("На полке нет места",
-                        availableSpace, bookMarkIds.size()));
+                response.put("message", "На полке нет места");
                 return response;
             }
 

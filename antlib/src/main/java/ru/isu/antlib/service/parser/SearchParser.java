@@ -20,7 +20,6 @@ public class SearchParser {
                     .timeout(10000)
                     .get();
 
-            // Ищем ссылку на книгу
             Elements productLinks = doc.select("a.product-card__img");
 
             for (Element link : productLinks) {
@@ -30,7 +29,6 @@ public class SearchParser {
                 }
             }
 
-            // Альтернативный поиск
             Elements alternativeLinks = doc.select("div.product-card a");
             for (Element link : alternativeLinks) {
                 String href = link.attr("href");
@@ -40,7 +38,6 @@ public class SearchParser {
                 }
             }
 
-            // Книга не найдена - кидаем исключение
             throw new BookNotFoundException("Книга не найдена. Проверьте корректность ISBN или введите данные вручную");
 
         } catch (IOException e) {

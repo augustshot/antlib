@@ -1,7 +1,6 @@
 package ru.isu.antlib.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.isu.antlib.model.Library;
@@ -10,7 +9,6 @@ import ru.isu.antlib.model.UserLibrary;
 import ru.isu.antlib.repository.UserLibraryRepository;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class UserLibraryService {

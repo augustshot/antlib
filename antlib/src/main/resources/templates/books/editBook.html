@@ -27,7 +27,6 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 
-    <!-- Одна форма с th:object UserBook -->
     <form th:action="@{/books/book/edit/{id}(id=${userBook.userBookMark.id})}"  th:object="${userBook}" th:method="post">
         <input type="hidden" th:field="*{userBookMark.id}" />
         <!-- Секция: Основная информация (BookDescription) -->
@@ -137,7 +136,6 @@
             </div>
         </div>
 
-        <!-- Кнопки -->
         <div class="d-flex justify-content-end gap-3 mt-4 mb-5">
             <a th:href="@{/books}" class="btn btn-outline-secondary px-4" id="cancelBtn">Отмена</a>
             <button type="submit" class="btn btn-success px-4">Сохранить изменения</button>

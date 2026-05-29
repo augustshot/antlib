@@ -101,7 +101,7 @@ public class CollectionController {
             response.put("redirectUrl", "/collections/collection/" + collection.getId());
         } catch (Exception e) {
             response.put("success", false);
-            response.put("message", "Ошибка при создании коллекции: " + e.getMessage());
+            response.put("message", "Ошибка при создании коллекции");
 
         }
         return response;
@@ -335,7 +335,7 @@ public class CollectionController {
         } catch (Exception e) {
 
             response.put("success", false);
-            response.put("message", "Ошибка при добавлении книг: " + e.getMessage());
+            response.put("message", "Ошибка при добавлении книг");
         }
 
         return response;
@@ -375,7 +375,7 @@ public class CollectionController {
 
         } catch (Exception e) {
             response.put("success", false);
-            response.put("message", "Ошибка при удалении: " + e.getMessage());
+            response.put("message", "Ошибка при удалении книги");
         }
 
         return response;

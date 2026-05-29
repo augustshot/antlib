@@ -6,10 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.isu.antlib.model.Library;
 import ru.isu.antlib.model.User;
 import ru.isu.antlib.repository.LibraryRepository;
-import ru.isu.antlib.repository.UserLibraryRepository;
 
-import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 
@@ -17,9 +14,6 @@ import java.util.Random;
 public class LibraryService {
     @Autowired
     private LibraryRepository libraryRepository;
-
-    @Autowired
-    private UserLibraryRepository userLibraryRepository;
 
     private final Random random = new Random();
 

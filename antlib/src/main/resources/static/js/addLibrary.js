@@ -49,7 +49,6 @@ function init() {
         validateName();
     });
 
-    // Отправка по Enter
     nameInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
             e.preventDefault();
@@ -57,7 +56,6 @@ function init() {
         }
     });
 
-    // Очистка формы при открытии модального окна
     if (modal) {
         modal.addEventListener('show.bs.modal', function() {
             nameInput.value = '';

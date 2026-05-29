@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.isu.antlib.model.CollectionBook;
-import ru.isu.antlib.model.CollectionBookId;
 import ru.isu.antlib.model.UserBookMark;
 import ru.isu.antlib.repository.CollectionBookRepository;
 

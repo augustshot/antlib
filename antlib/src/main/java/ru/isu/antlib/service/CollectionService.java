@@ -5,20 +5,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.isu.antlib.model.Collection;
 import ru.isu.antlib.model.User;
-import ru.isu.antlib.model.UserBookMark;
 import ru.isu.antlib.repository.CollectionRepository;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 @Service
 public class CollectionService {
     @Autowired
     private CollectionRepository collectionRepository;
-
-    @Autowired
-    private UserBookMarkService userBookMarkService;
 
     @Transactional
     public Collection save(Collection collection){

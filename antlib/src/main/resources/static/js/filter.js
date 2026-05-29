@@ -11,7 +11,6 @@ function debounce(func, delay) {
     }
 
     function initFilters() {
-        // Текстовые поля - с задержкой 500ms
         const textFields = ['title', 'author', 'language', 'isbn'];
         const debouncedSubmit = debounce(submitFilterForm, 2000);
 
@@ -22,7 +21,6 @@ function debounce(func, delay) {
             }
         });
 
-        // Выпадающие списки - сразу
         const selectFields = ['ratingFrom', 'ratingTo', 'status', 'source'];
         selectFields.forEach(fieldName => {
             const element = document.querySelector(`[name="${fieldName}"]`);

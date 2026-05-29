@@ -4,8 +4,8 @@
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: contain; /* Показывает книгу целиком, не обрезая края */
-    border-radius: 8px; /* Скругление только если картинка меньше контейнера, но тут лучше убрать или оставить */
+    object-fit: contain; 
+    border-radius: 8px; 
 }
 .book-cover-placeholder {
     position: absolute;
@@ -47,15 +47,10 @@
     border-bottom: 2px solid #e0e8e0;
 }
 
-/* Контейнер для обложки, фиксирующий пропорции */
 .cover-container {
     position: relative;
     width: 100%;
-    /*
-       Для книг стандартное соотношение сторон примерно 2:3 или 3:4.
-       150% означает, что высота будет в 1.5 раза больше ширины.
-       Если книги более вытянутые, поставьте 160% или 170%.
-    */
+
     padding-bottom: 150%;
     background-color: #f8f9fa;
     overflow: hidden;

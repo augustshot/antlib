@@ -6,7 +6,10 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Objects;
 
@@ -71,4 +74,8 @@ public class BookDescription {
                 Objects.equals(description, that.description);
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(title, author, ISBN, year, pages, language, publisher, cover, description);
+    }
 }

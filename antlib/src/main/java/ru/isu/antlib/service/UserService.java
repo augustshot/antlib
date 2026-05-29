@@ -77,7 +77,7 @@ public class UserService implements UserDetailsService{
     public void delete(User user) {
         List<UserBookMark> marks = userBookMarkService.getAllByUser(user);
 
-        // чтобы удалились все BookDescription с verified = 0, созданные и используемые только этим пользователем
+        // удаляем все bd с veirified = 0
         for (UserBookMark mark : marks) userBookMarkService.deleteBook(mark);
         userRepository.delete(user);
     }

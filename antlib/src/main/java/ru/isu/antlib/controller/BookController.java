@@ -10,6 +10,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
@@ -19,16 +20,17 @@ import ru.isu.antlib.dto.UserBookDto;
 import ru.isu.antlib.exception.BookNotFoundException;
 import ru.isu.antlib.exception.BookTimeoutException;
 import ru.isu.antlib.model.*;
+import ru.isu.antlib.repository.BookDescriptionRepository;
+import ru.isu.antlib.repository.UserBookMarkRepository;
 import ru.isu.antlib.repository.UserLibraryRepository;
-import ru.isu.antlib.service.*;
+import ru.isu.antlib.repository.UserRepository;
+import ru.isu.antlib.service.BookDescriptionService;
+import ru.isu.antlib.service.UserBookMarkService;
+import ru.isu.antlib.service.UserService;
 import ru.isu.antlib.service.parser.BookParser;
 import ru.isu.antlib.specification.UserBookMarkSpecification;
 import ru.isu.antlib.validation.BookDescriptionValidator;
 import ru.isu.antlib.validation.UserBookMarkValidator;
-import ru.isu.antlib.repository.BookDescriptionRepository;
-import ru.isu.antlib.repository.UserBookMarkRepository;
-import ru.isu.antlib.repository.UserRepository;
-import org.springframework.ui.Model;
 
 import java.util.*;
 
@@ -111,15 +113,11 @@ public class BookController {
         Integer ratingTo = null;
 
         if (filter.getRatingFrom() != null && !filter.getRatingFrom().isEmpty()) {
-            try {
-                ratingFrom = Integer.parseInt(filter.getRatingFrom());
-            } catch (NumberFormatException ignored) {}
+            ratingFrom = Integer.parseInt(filter.getRatingFrom());
         }
 
         if (filter.getRatingTo() != null && !filter.getRatingTo().isEmpty()) {
-            try {
-                ratingTo = Integer.parseInt(filter.getRatingTo());
-            } catch (NumberFormatException ignored) {}
+            ratingTo = Integer.parseInt(filter.getRatingTo());
         }
 
         spec = spec.and(UserBookMarkSpecification.ratingBetween(ratingFrom, ratingTo));
@@ -165,8 +163,7 @@ public class BookController {
     
     @GetMapping("searchISBN")
     public String searchByIsbn(@RequestParam(value="isbn") String isbn, Model model) {
-        
-
+    
         // есть в бд?
         BookDescription book = bookDescriptionService.findByISBNVerified(isbn);
         if(book != null){
@@ -203,7 +200,7 @@ public class BookController {
             model.addAttribute("userBook", new UserBookDto());
 
         } catch (Exception e) {
-            model.addAttribute("errorMessage", "Произошла неизвестная ошибка: " + e.getMessage());
+            model.addAttribute("errorMessage", "Произошла неизвестная ошибка");
             model.addAttribute("userBook", new UserBookDto());
         }
 
@@ -250,7 +247,7 @@ public class BookController {
                     userBookMark.setUser(currentUser);
                     userBookMarkService.save(userBookMark);
                     added.add(s);
-                }else{
+                } else{
                     // нет в бд, нет у пользователя - добавляем
                     book = BookParser.findByISBN(s);
                     if (book != null) {
@@ -272,6 +269,7 @@ public class BookController {
         redirectAttributes.addFlashAttribute("skipped", skipped);
         redirectAttributes.addFlashAttribute("duplicates", duplicates);
         redirectAttributes.addFlashAttribute("showModal", true);
+        
         String summaryMessage = String.format("Добавлено: %d, пропущено: %d, дубликаты: %d",
                 added.size(), skipped.size(), duplicates.size());
 
@@ -335,7 +333,7 @@ public class BookController {
             Integer year = bookData.get("year") != null ? Integer.parseInt(bookData.get("year").toString()) : null;
             Boolean verified = bookData.get("verified") != null && (Boolean) bookData.get("verified");
 
-            // Проверяем, есть ли уже такая книга в БД
+            // есть в бд?
             BookDescription existingBook = null;
             if (isbn != null && !isbn.isEmpty()) {
                 existingBook = bookDescriptionService.findByISBNVerified(isbn.replace("-", ""));
@@ -396,8 +394,7 @@ public class BookController {
     public String updateBookInfo(
             @Valid @ModelAttribute("userBook") UserBookDto userBook,
             BindingResult bindingResult,
-            @PathVariable Integer id
-            ) {
+            @PathVariable Integer id) {
 
         if (bindingResult.hasErrors())
             return "books/editBook";

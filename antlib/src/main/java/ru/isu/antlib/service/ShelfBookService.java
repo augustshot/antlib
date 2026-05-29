@@ -7,11 +7,9 @@ import ru.isu.antlib.model.Library;
 import ru.isu.antlib.model.Shelf;
 import ru.isu.antlib.model.ShelfBook;
 import ru.isu.antlib.repository.ShelfBookRepository;
-import ru.isu.antlib.repository.ShelfRepository;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class ShelfBookService {

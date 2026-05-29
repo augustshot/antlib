@@ -8,6 +8,7 @@ import ru.isu.antlib.exception.BookNotFoundException;
 import ru.isu.antlib.exception.BookParseException;
 import ru.isu.antlib.exception.BookTimeoutException;
 import ru.isu.antlib.model.BookDescription;
+
 import java.io.IOException;
 
 public class BookParser {
@@ -33,7 +34,6 @@ public class BookParser {
         try {
             BookDescription book = new BookDescription();
 
-            // Парсинг с защитой от NullPointerException
             Element ogTitle = doc.selectFirst("meta[property=og:title]");
             String title = "";
             if (ogTitle != null) {
@@ -49,7 +49,7 @@ public class BookParser {
                 throw new BookParseException("Не удалось определить название книги");
             }
 
-            // Автор
+            // автор
             String author = "";
             Elements features = doc.select("div._feature_mmfyx_1");
             for (Element feature : features) {
@@ -66,7 +66,6 @@ public class BookParser {
                 }
             }
 
-            // Очистка названия от автора
             for (String s : author.split(" ")) {
                 title = title.replace(s, "");
             }
@@ -74,13 +73,13 @@ public class BookParser {
             book.setTitle(title.trim());
             book.setAuthor(author);
 
-            // ISBN
+            // isbn
             Element metaIsbn = doc.selectFirst("meta[itemprop=isbn]");
             if (metaIsbn != null) {
                 book.setISBN(metaIsbn.attr("content").replace("-", ""));
             }
 
-            // Год и издательство
+            // год и издательство
             for (Element feature : features) {
                 Element nameDiv = feature.selectFirst("div._name_mmfyx_9");
                 if (nameDiv != null) {
@@ -111,7 +110,7 @@ public class BookParser {
                 }
             }
 
-            // Обложка
+            // обложка
             Element ogImage = doc.selectFirst("meta[property=og:image]");
             if (ogImage != null) {
                 book.setCover(ogImage.attr("content"));
@@ -126,7 +125,7 @@ public class BookParser {
                 }
             }
 
-            // Описание
+            // аннотация
             Element annotationBlock = doc.selectFirst("#annotation");
             if (annotationBlock != null) {
                 Element contentDiv = annotationBlock.selectFirst("._content_eijg8_12");

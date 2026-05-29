@@ -19,7 +19,6 @@
 <input type="hidden" id="collectionId" th:value="${collection.id}">
 
 <div class="container mt-4">
-    <!-- Верхний блок с информацией о коллекции -->
     <div class="card mb-4">
         <div class="card-body">
             <div class="row align-items-center">
@@ -41,7 +40,6 @@
         </div>
     </div>
 
-    <!-- Блок книг коллекции -->
     <div class="card">
         <div class="card-header bg-white d-flex justify-content-between align-items-center">
             <h5 class="mb-0 text-success">
@@ -109,7 +107,6 @@
                     </table>
                 </div>
 
-                <!-- Пагинация как в allBooks.html -->
                 <div class="text-center mt-3 mb-3" th:if="${page.totalPages > 1}">
                     <nav>
                         <ul class="pagination justify-content-center">
@@ -143,7 +140,6 @@
     </div>
 </div>
 
-<!-- Модальные окна (без изменений) -->
 <div class="modal fade" id="editCollectionModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">

@@ -3,9 +3,6 @@ package ru.isu.antlib.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.io.Serializable;
-import java.util.Objects;
-
 @Getter
 @Setter
 @NoArgsConstructor

@@ -105,7 +105,6 @@ function init(){
             }
         });
 
-        // Отправка по Enter
         isbnInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();

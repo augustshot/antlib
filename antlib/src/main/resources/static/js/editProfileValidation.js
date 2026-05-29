@@ -46,7 +46,6 @@ function init() {
         }
     }
 
-    // Проверка имени пользователя
     if (usernameInput) {
         usernameInput.addEventListener('input', function() {
             const username = usernameInput.value.trim();
@@ -57,7 +56,6 @@ function init() {
                 return;
             }
 
-            // Если имя не изменилось - не проверяем
             if (username === originalUsername) {
                 setValid(usernameInput, true, usernameError, '');
                 isUsernameValid = true;
@@ -84,7 +82,6 @@ function init() {
         });
     }
 
-    // Проверка email
     function validateEmail() {
         if (!emailInput) return true;
 
@@ -109,20 +106,17 @@ function init() {
         emailInput.addEventListener('input', validateEmail);
     }
 
-    // Проверка паролей
     function validatePasswords() {
         let isValid = true;
         const newPassword = newPasswordInput ? newPasswordInput.value : '';
         const confirmPassword = confirmPasswordInput ? confirmPasswordInput.value : '';
 
-        // Если поля пустые - пропускаем валидацию (пароль не меняется)
         if (!newPassword && !confirmPassword) {
             resetValidation(newPasswordInput, newPasswordError);
             resetValidation(confirmPasswordInput, confirmPasswordError);
             return true;
         }
 
-        // Проверка нового пароля
         if (!newPassword) {
             setValid(newPasswordInput, false, newPasswordError, 'Введите новый пароль');
             isValid = false;
@@ -133,7 +127,6 @@ function init() {
             setValid(newPasswordInput, true, newPasswordError, '');
         }
 
-        // Проверка подтверждения пароля
         if (!confirmPassword) {
             setValid(confirmPasswordInput, false, confirmPasswordError, 'Подтвердите новый пароль');
             isValid = false;
@@ -154,11 +147,9 @@ function init() {
         confirmPasswordInput.addEventListener('input', validatePasswords);
     }
 
-    // Отправка формы
     function submitForm() {
         let isValid = true;
 
-        // Валидация username
         if (usernameInput && (!usernameInput.value.trim() || !isUsernameValid)) {
             if (!usernameInput.value.trim()) {
                 setValid(usernameInput, false, usernameError, 'Введите имя пользователя');
@@ -170,7 +161,6 @@ function init() {
         if (!validatePasswords()) isValid = false;
 
         if (isValid) {
-            // Устанавливаем значение из new-password в скрытое поле password
             if (passwordHiddenInput && newPasswordInput) {
                 const newPassword = newPasswordInput.value;
                 if (newPassword && newPassword.trim()) {
@@ -184,7 +174,6 @@ function init() {
         }
     }
 
-    // Кнопка сохранения
     const submitButton = document.getElementById('submit-button');
     if (submitButton) {
         submitButton.addEventListener('click', function(e) {
@@ -194,7 +183,6 @@ function init() {
         });
     }
 
-    // Обработка Enter
     if (form) {
         form.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
@@ -204,7 +192,6 @@ function init() {
         });
     }
 
-    // Кнопка удаления профиля
     const deleteProfileBtn = document.getElementById('deleteProfileBtn');
     if (deleteProfileBtn) {
         deleteProfileBtn.addEventListener('click', function() {

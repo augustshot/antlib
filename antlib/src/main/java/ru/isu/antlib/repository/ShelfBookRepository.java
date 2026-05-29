@@ -4,7 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 import ru.isu.antlib.model.ShelfBook;
 
 import java.util.List;
@@ -32,11 +31,11 @@ public interface ShelfBookRepository extends JpaRepository<ShelfBook, Integer> {
             "JOIN sb.shelf s " +
             "JOIN s.room r " +
             "WHERE r.library.id = :libraryId " +
-            "AND (LOWER(bd.title) LIKE :searchPattern " +
-            "OR LOWER(bd.author) LIKE :searchPattern " +
-            "OR bd.ISBN LIKE :searchPattern)")
+            "AND (LOWER(bd.title) LIKE :search " +
+            "OR LOWER(bd.author) LIKE :search " +
+            "OR bd.ISBN LIKE :search)")
     List<Map<String, Object>> searchBooksInLibrary(@Param("libraryId") Integer libraryId,
-                                                   @Param("searchPattern") String searchPattern);
+                                                   @Param("search") String search);
 
     
 }

@@ -82,7 +82,6 @@ function init() {
         return true;
     }
 
-    // Динамическая проверка username
     if (usernameInput) {
         usernameInput.addEventListener('input', function() {
             const username = usernameInput.value.trim();
@@ -138,22 +137,18 @@ function init() {
     function submitForm() {
         let isValid = true;
 
-        // Проверка username
         if (!validateField(usernameInput, usernameError, 'имя пользователя') || !isUsernameValid) {
             isValid = false;
         }
 
-        // Проверка email
         if (!validateField(emailInput, emailError, 'email')) {
             isValid = false;
         }
 
-        // Проверка пароля (длина)
         if (!checkPasswordStrength()) {
             isValid = false;
         }
 
-        // Проверка подтверждения пароля
         if (!confirmInput || !confirmInput.value.trim()) {
             setValid(confirmInput, false, confirmError, 'Подтвердите пароль');
             isValid = false;
@@ -171,7 +166,6 @@ function init() {
         return isValid;
     }
 
-    // Обработчики событий
     if (emailInput) {
         emailInput.addEventListener('input', function() {
             validateField(emailInput, emailError, 'email');

@@ -1,10 +1,9 @@
-// openlibrary-search.js
+
 
 let currentSearchQuery = {};
 let currentPage = 1;
 const resultsPerPage = 15;
 
-// Выполнение поиска
 async function searchBooks(query, page = 1) {
     const limit = resultsPerPage;
     const offset = (page - 1) * limit;
@@ -28,13 +27,10 @@ async function searchBooks(query, page = 1) {
     }
 }
 
-// Функция для получения лучшего ISBN
 function getBestIsbn(book) {
-    // 1. Пытаемся взять из editions.docs
     if (book.editions && book.editions.docs && book.editions.docs.length > 0) {
         for (const edition of book.editions.docs) {
             if (edition.isbn && Array.isArray(edition.isbn) && edition.isbn.length > 0) {
-                // Ищем ISBN-13
                 let isbn13 = edition.isbn.find(isbn => {
                     let clean = String(isbn).replace(/-/g, '');
                     return (clean.startsWith('97')) && clean.length === 13;
@@ -45,30 +41,25 @@ function getBestIsbn(book) {
         }
     }
 
-    // 2. Если нет в editions, пробуем внешний isbn
     if (book.isbn && Array.isArray(book.isbn) && book.isbn.length > 0) {
-        // Ищем ISBN-13
         let isbn13 = book.isbn.find(isbn => {
             let clean = String(isbn).replace(/-/g, '');
             return (clean.startsWith('97'))  && clean.length === 13;
         });
         if (isbn13) return isbn13;
 
-        // Ищем валидный ISBN-10
         let isbn10 = book.isbn.find(isbn => {
             let clean = String(isbn).replace(/-/g, '');
             return clean.length === 10 && /^\d+$/.test(clean);
         });
         if (isbn10) return isbn10;
 
-        // Возвращаем первый
         return book.isbn[0];
     }
 
     return null;
 }
 
-// Создание карточки книги
 function createBookCard(book) {
     const coverId = book.cover_i;
     const coverUrl = coverId
@@ -87,7 +78,6 @@ function createBookCard(book) {
     const cardDiv = document.createElement('div');
     cardDiv.className = 'card h-100 book-card';
 
-    // Обложка
     const coverWrapper = document.createElement('div');
     coverWrapper.className = 'cover-wrapper';
     coverWrapper.style.height = '200px';
@@ -118,7 +108,6 @@ function createBookCard(book) {
     }
     cardDiv.appendChild(coverWrapper);
 
-    // Тело карточки
     const cardBody = document.createElement('div');
     cardBody.className = 'card-body';
 
@@ -150,7 +139,6 @@ function createBookCard(book) {
 
     cardDiv.appendChild(cardBody);
 
-    // Футер с кнопкой
     const cardFooter = document.createElement('div');
     cardFooter.className = 'card-footer bg-transparent border-top-0 pt-0';
 
@@ -175,9 +163,7 @@ function createBookCard(book) {
     return col;
 }
 
-// Выбор книги - сохраняем в БД и заполняем форму
 async function selectBook(book) {
-    // Показываем индикатор загрузки
     const selectBtn = event?.target;
     if (selectBtn) {
         selectBtn.disabled = true;
@@ -185,7 +171,6 @@ async function selectBook(book) {
     }
 
     try {
-        // 1. Сохраняем книгу в БД через API
         const response = await fetch('/books/saveFromSearch', {
             method: 'POST',
             headers: {
@@ -204,7 +189,6 @@ async function selectBook(book) {
         const result = await response.json();
 
         if (result.success) {
-            // 2. Заполняем форму полученными данными
             const titleInput = document.getElementById('title');
             const authorInput = document.getElementById('author');
             const coverInput = document.getElementById('cover');
@@ -229,7 +213,6 @@ async function selectBook(book) {
         }
     }
 
-    // Закрыть модальное окно
     const modalElement = document.getElementById('searchModal');
     if (modalElement) {
         const modal = bootstrap.Modal.getInstance(modalElement);
@@ -237,7 +220,6 @@ async function selectBook(book) {
     }
 }
 
-// Отображение пагинации
 function renderPagination(totalPages, currentPage) {
     const paginationDiv = document.getElementById('searchPagination');
     if (!paginationDiv) return;
@@ -281,8 +263,6 @@ function renderPagination(totalPages, currentPage) {
     });
 }
 
-// Основная функция поиска
-// Основная функция поиска
 async function performSearch(page = 1) {
     const title = document.getElementById('searchTitle')?.value || '';
     const author = document.getElementById('searchAuthor')?.value || '';
@@ -320,7 +300,6 @@ async function performSearch(page = 1) {
     if (resultsGrid) {
         resultsGrid.innerHTML = '';
 
-        // Создаём строки и карточки
         data.docs.forEach(book => {
             const card = createBookCard(book);
             resultsGrid.appendChild(card);
@@ -336,7 +315,6 @@ async function performSearch(page = 1) {
     renderPagination(totalPages, page);
 }
 
-// Инициализация
 document.addEventListener('DOMContentLoaded', function() {
     const searchBtn = document.getElementById('searchBooksBtn');
     if (searchBtn) {
@@ -357,7 +335,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Очистка при открытии модалки
     const searchModal = document.getElementById('searchModal');
     if (searchModal) {
         searchModal.addEventListener('show.bs.modal', function() {
